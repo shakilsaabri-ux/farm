@@ -1,0 +1,2499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Halima Dairy Farm — Complete Management System</title>
+  <meta name="theme-color" content="#090F0C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root {
+      --bg-main: #090F0C;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --text-muted-dark: #6B7280;
+      --primary: #10B981;
+      --primary-light: #34D399;
+      --primary-btn-text: #06110D;
+      --border-color: #1F2937;
+      --border-card: #1F3A31;
+      --bg-card: linear-gradient(135deg, #111C17 0%, #162420 100%);
+      --bg-panel: #111C17;
+      --bg-input: #070D0C;
+      --border-input: #244238;
+      --bg-back-btn: #1A2E28;
+      --text-back-btn: #CBD5E1;
+      --bg-table-wrapper: #0C1412;
+      --bg-th: #142420;
+      --border-table-row: #162924;
+      --text-table: #E5E7EB;
+      --bg-alert-success: #092419;
+      --text-alert-success: #A7F3D0;
+    }
+    body.light-theme {
+      --bg-main: #F9FAFB; --text-main: #111827; --text-muted: #4B5563;
+      --text-muted-dark: #9CA3AF; --primary: #059669; --primary-light: #047857;
+      --primary-btn-text: #FFFFFF; --border-color: #E5E7EB; --border-card: #D1FAE5;
+      --bg-card: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 100%); --bg-panel: #FFFFFF;
+      --bg-input: #F3F4F6; --border-input: #D1D5DB; --bg-back-btn: #EEF2F6;
+      --text-back-btn: #1F2937; --bg-table-wrapper: #FFFFFF; --bg-th: #F3F4F6;
+      --border-table-row: #E5E7EB; --text-table: #374151;
+      --bg-alert-success: #E6F4EA; --text-alert-success: #065F46;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body { width:100%; height:100%; background-color:var(--bg-main); color:var(--text-main);
+      font-family:'Plus Jakarta Sans',-apple-system,sans-serif; overflow-x:hidden;
+      -webkit-overflow-scrolling:touch; transition:background-color 0.2s,color 0.2s; }
+    #root { padding-bottom: 80px; }
+
+    /* ── HEADER ── */
+    .app-header { display:flex; justify-content:space-between; align-items:center;
+      padding:12px 16px 0 16px; margin-bottom:4px; }
+    .farm-title { color:var(--primary); font-size:20px; font-weight:800; text-transform:uppercase; letter-spacing:0.3px; }
+    .farm-sub { color:var(--text-muted-dark); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+    .theme-btn { background:var(--bg-panel); border:1px solid var(--border-card); color:var(--primary);
+      padding:7px 11px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;
+      display:flex; align-items:center; gap:5px; text-transform:uppercase; letter-spacing:0.5px; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:var(--bg-panel);
+      border-top:1px solid var(--border-card); display:flex; justify-content:space-around;
+      align-items:center; padding:6px 2px 14px 2px; z-index:1000; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; cursor:pointer;
+      padding:4px 6px; border-radius:8px; min-width:44px; transition:0.15s; }
+    .nav-item.active .nav-icon { color:var(--primary); }
+    .nav-item.active .nav-label { color:var(--primary); }
+    .nav-icon { font-size:20px; margin-bottom:1px; color:var(--text-muted-dark); }
+    .nav-label { font-size:8px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-muted-dark); white-space:nowrap; }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider { font-size:11px; font-weight:800; text-transform:uppercase; color:var(--primary);
+      letter-spacing:0.8px; margin:20px 0 10px 0; padding-bottom:6px; border-bottom:1px solid var(--border-color); }
+
+    /* ── DASHBOARD GRID ── */
+    .dash-grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:12px; }
+    .dash-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+    .d-card { background:var(--bg-card); border:1px solid var(--border-card); border-radius:10px;
+      padding:10px 12px; min-height:62px; display:flex; flex-direction:row; align-items:center;
+      justify-content:space-between; cursor:pointer; transition:transform 0.15s,border-color 0.15s; }
+    .d-card:active { transform:scale(0.96); border-color:var(--primary); }
+    .d-card-left { display:flex; flex-direction:column; justify-content:center; }
+    .d-card-icon { font-size:15px; color:var(--text-muted); }
+    .d-label { color:var(--text-muted); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:2px; }
+    .d-val { color:var(--text-main); font-size:18px; font-weight:800; letter-spacing:-0.4px; }
+    .d-val-sm { color:var(--text-main); font-size:14px; font-weight:800; }
+    .d-unit { font-size:9px; color:var(--text-muted-dark); font-weight:700; text-transform:uppercase; margin-left:2px; }
+    .d-curr { font-size:12px; font-weight:700; color:var(--primary-light); margin-right:1px; }
+
+    /* ── FORM PANEL ── */
+    .page-wrap { padding:0 16px 20px 16px; }
+    .form-panel { background:var(--bg-panel); border-radius:10px; padding:14px; border:1px solid var(--border-card); margin-bottom:14px; }
+    .panel-header { color:var(--primary); font-size:12px; font-weight:700; margin:0 0 12px 0;
+      text-transform:uppercase; border-bottom:1px solid var(--border-card); padding-bottom:6px;
+      display:flex; justify-content:space-between; align-items:center; }
+    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    .input-row { display:flex; flex-direction:column; margin-bottom:10px; }
+    .field-lbl { color:var(--text-muted); font-size:11px; font-weight:600; margin-bottom:4px; text-transform:uppercase; }
+    .farm-input { background:var(--bg-input); border:1px solid var(--border-input); border-radius:6px;
+      color:var(--text-main); padding:8px 10px; font-size:13px; font-family:inherit; width:100%; height:37px; }
+    .farm-input:focus { border-color:var(--primary); outline:none; }
+    .farm-input:disabled { opacity:0.6; }
+    .farm-select { background:var(--bg-input); border:1px solid var(--border-input); border-radius:6px;
+      color:var(--text-main); padding:8px 10px; font-size:13px; font-family:inherit; width:100%; height:37px; }
+    .farm-select:focus { border-color:var(--primary); outline:none; }
+    .submit-btn { background:var(--primary); color:var(--primary-btn-text); border:none; padding:11px;
+      border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; width:100%;
+      text-transform:uppercase; margin-top:6px; letter-spacing:0.5px; }
+    .submit-btn:active { opacity:0.85; }
+    .back-btn { background:var(--bg-back-btn); color:var(--text-back-btn); border:1px solid var(--border-input);
+      padding:6px 12px; border-radius:4px; font-size:10px; font-weight:700; cursor:pointer; text-transform:uppercase; }
+
+    /* ── TABLE ── */
+    .tbl-wrap { width:100%; overflow-x:auto; background:var(--bg-table-wrapper); border:1px solid var(--border-card);
+      border-radius:8px; margin-top:10px; }
+    .data-table { width:100%; border-collapse:collapse; text-align:left; font-size:12px; min-width:480px; }
+    .data-table th { background:var(--bg-th); color:var(--primary-light); padding:9px 8px; font-weight:700;
+      text-transform:uppercase; font-size:10px; letter-spacing:0.4px; border-bottom:1px solid var(--border-card); }
+    .data-table td { padding:9px 8px; border-bottom:1px solid var(--border-table-row); color:var(--text-table); vertical-align:middle; }
+    .data-table tr:last-child td { border-bottom:none; }
+    .del-btn { background:#3B1818; color:#FCA5A5; border:1px solid #5C2525; padding:3px 7px;
+      border-radius:4px; font-size:10px; font-weight:700; cursor:pointer; text-transform:uppercase; }
+    .del-btn:active { background:#5C2525; }
+
+    /* ── ALERTS ── */
+    .alert-box { border-radius:6px; padding:10px 12px; display:flex; align-items:center;
+      justify-content:space-between; gap:8px; margin-bottom:8px; }
+    .alert-danger { background:#2A1414; border-left:4px solid #EF4444; }
+    .alert-warn { background:#2A1F0A; border-left:4px solid #F59E0B; }
+    .alert-ok { background:var(--bg-alert-success); border-left:4px solid var(--primary); }
+    .alert-txt { font-size:12px; font-weight:600; color:#FCA5A5; line-height:1.4; }
+    .alert-txt-warn { font-size:12px; font-weight:600; color:#FCD34D; line-height:1.4; }
+    .alert-txt-ok { font-size:12px; font-weight:600; color:var(--text-alert-success); line-height:1.4; }
+    .alert-badge { font-size:9px; font-weight:800; padding:3px 7px; border-radius:10px; text-transform:uppercase; flex-shrink:0; }
+
+    /* ── OVERLAY MODAL ── */
+    .overlay { position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(5,10,8,0.88); display:flex; align-items:center; justify-content:center;
+      padding:16px; z-index:2000; }
+    .modal-box { background:var(--bg-panel); border:1px solid var(--border-card); border-radius:12px;
+      padding:20px; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
+    .modal-title { margin:0 0 14px 0; color:var(--primary); text-transform:uppercase; font-size:14px;
+      font-weight:800; border-bottom:1px solid var(--border-card); padding-bottom:6px; }
+
+    /* ── BADGE ── */
+    .badge { display:inline-block; font-size:9px; font-weight:800; padding:2px 7px; border-radius:10px; text-transform:uppercase; }
+    .badge-green { background:#064E3B; color:#6EE7B7; }
+    .badge-red { background:#7F1D1D; color:#FCA5A5; }
+    .badge-amber { background:#78350F; color:#FCD34D; }
+    .badge-blue { background:#1E3A5F; color:#93C5FD; }
+    .badge-purple { background:#3B1F6B; color:#C4B5FD; }
+    .badge-gray { background:#374151; color:#9CA3AF; }
+
+    /* ── STATUS TAG ── */
+    .status-tag { font-size:10px; font-weight:800; padding:3px 8px; border-radius:12px; text-transform:uppercase; }
+
+    /* ── DELIVERY MATRIX ── */
+    .matrix-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px; }
+    .matrix-cell { background:var(--bg-input); border:1px solid var(--border-card); border-radius:6px;
+      padding:6px 4px; text-align:center; }
+    .matrix-month { font-size:9px; font-weight:800; color:var(--text-muted-dark); text-transform:uppercase; }
+    .matrix-count { font-size:14px; font-weight:800; color:var(--primary); }
+
+    /* ── QUICK ACTION CARDS ── */
+    .action-card { border-radius:10px; padding:12px 14px; min-height:60px; display:flex;
+      flex-direction:column; justify-content:center; cursor:pointer; transition:transform 0.15s; }
+    .action-card:active { transform:scale(0.96); }
+    .ac-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:rgba(255,255,255,0.7); margin-bottom:3px; }
+    .ac-title { font-size:14px; font-weight:800; color:#fff; }
+
+    /* ── PAGE SCROLL CONTAINER ── */
+    .scroll-page { padding:0 16px 24px 16px; min-height:100vh; background:var(--bg-main); }
+
+    /* ── REPORT ROWS ── */
+    .report-row { display:flex; justify-content:space-between; align-items:center;
+      padding:10px 0; border-bottom:1px solid var(--border-table-row); font-size:13px; }
+    .report-row:last-child { border-bottom:none; }
+    .report-key { color:var(--text-muted); font-weight:600; }
+    .report-val { font-weight:800; color:var(--text-main); }
+
+    .green-val { color:var(--primary); }
+    .red-val { color:#EF4444; }
+    .amber-val { color:#F59E0B; }
+    .blue-val { color:#60A5FA; }
+
+    /* inline auto-calc hint */
+    .auto-hint { font-size:11px; color:var(--primary); font-weight:700; padding-top:6px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+    const BASE_DATE = '2026-06-03';
+
+    // ─────────────────────────────────────────────
+    //  INITIAL DATA SEEDS
+    // ─────────────────────────────────────────────
+    const INIT_BUFFALO = [
+      { id:'b1', tagId:'KORI-101', khilaNo:'A-01', shed:'Shed A', incomingDate:'2026-01-10', outgoingDate:'', status:'Fali', lactationCycle:1 },
+      { id:'b2', tagId:'KORI-102', khilaNo:'A-02', shed:'Shed A', incomingDate:'2026-02-05', outgoingDate:'', status:'Pregnant', lactationCycle:1 },
+      { id:'b3', tagId:'TAJI-201', khilaNo:'B-01', shed:'Shed B', incomingDate:'2026-03-15', outgoingDate:'', status:'Khali', lactationCycle:2 },
+      { id:'b4', tagId:'KORI-103', khilaNo:'Noora', shed:'Noora', incomingDate:'2025-12-01', outgoingDate:'', status:'Pregnant', lactationCycle:1 },
+      { id:'b5', tagId:'KORI-104', khilaNo:'Tosif', shed:'Tosif', incomingDate:'2025-11-15', outgoingDate:'', status:'Fali', lactationCycle:1 }
+    ];
+    const INIT_FALI = [
+      { id:'f1', tagId:'KORI-101', shed:'Shed A', faliDate:'2026-04-01', bull:'Bull-1', serviceCount:1, doctorResult:'', doctorDate:'' },
+      { id:'f2', tagId:'KORI-102', shed:'Shed A', faliDate:'2026-03-20', bull:'Bull-2', serviceCount:1, doctorResult:'Pregnant', doctorDate:'2026-05-14' },
+      { id:'f3', tagId:'TAJI-201', shed:'Shed B', faliDate:'2026-03-10', bull:'Bull-1', serviceCount:1, doctorResult:'Khali', doctorDate:'2026-05-04' }
+    ];
+    const INIT_KORI = [
+      { id:'k1', date:'2026-01-10', bhaisWala:'Munna Bhai', animals:3, amount:450000 },
+      { id:'k2', date:'2026-02-05', bhaisWala:'Munna Bhai', animals:2, amount:320000 }
+    ];
+    const INIT_BHAIS_PAY = [
+      { id:'bp1', date:'2026-02-01', bhaisWala:'Munna Bhai', amount:200000 }
+    ];
+    const INIT_SLAUGHTERED = [
+      { id:'sl1', tagId:'OLD-99', khilaNo:'A-10', shed:'Shed A', amount:35000, kasaiName:'Rafiq Kasai', outgoingDate:'2026-04-20' }
+    ];
+    const INIT_DEAD = [
+      { id:'dd1', tagId:'OLD-98', khilaNo:'B-08', shed:'Shed B', outgoingDate:'2026-03-01' }
+    ];
+    const INIT_TAJI = [
+      { id:'tj1', date:'2026-03-15', tagId:'TAJI-201', palak:'Noora', freight:3400 }
+    ];
+    const INIT_BAKDI = [
+      { id:'bk1', date:'2026-02-10', tagId:'KORI-104', palak:'Tosif', freight:1800 }
+    ];
+    const INIT_IRSHAD_PAY = [
+      { id:'ip1', date:'2026-04-01', type:'Taji', tagId:'TAJI-201', amount:3400 }
+    ];
+    const INIT_PALAK_PAY = [
+      { id:'pp1', date:'2026-05-01', palak:'Noora', amount:3300, note:'May 2026' },
+      { id:'pp2', date:'2026-05-01', palak:'Tosif', amount:3100, note:'May 2026' }
+    ];
+
+    // Milk book
+    const INIT_PRODUCTION = [
+      { date:'2026-06-03', shedAMorn:88, shedAEve:76, shedBMorn:64, shedBEve:58 },
+      { date:'2026-06-02', shedAMorn:86, shedAEve:74, shedBMorn:62, shedBEve:57 },
+      { date:'2026-06-01', shedAMorn:84, shedAEve:72, shedBMorn:60, shedBEve:55 }
+    ];
+    const INIT_SUPPLY = [
+      { id:'s1', date:'2026-06-03', customer:'Zubair Hotel', mornLit:92, eveLit:60, rate:115, totalLiters:152, amount:17480 },
+      { id:'s2', date:'2026-06-03', customer:'Ali Shop', mornLit:110, eveLit:88, rate:110, totalLiters:198, amount:21780 }
+    ];
+    const INIT_MILK_PAY = [
+      { id:'mp1', date:'2026-06-01', customer:'Zubair Hotel', amount:10000 },
+      { id:'mp2', date:'2026-06-01', customer:'Ali Shop', amount:5000 }
+    ];
+
+    // Labour book
+    const INIT_LABOUR = [
+      { id:'l1', workerName:'Rajesh Kumar', joiningDate:'2026-01-01', oldAdvance:8000, leavingDate:'', pagarPerMonth:16000, shed:'Shed A' },
+      { id:'l2', workerName:'Manoj Yadav', joiningDate:'2025-11-15', oldAdvance:3500, leavingDate:'', pagarPerMonth:18500, shed:'Shed B' },
+      { id:'l3', workerName:'Suresh Pal', joiningDate:'2026-02-10', oldAdvance:15000, leavingDate:'', pagarPerMonth:15000, shed:'Shed A' },
+      { id:'l4', workerName:'Dinesh Solanki', joiningDate:'2026-03-01', oldAdvance:0, leavingDate:'2026-05-15', pagarPerMonth:17000, shed:'Shed B' }
+    ];
+    const INIT_LAB_PAY = [
+      { id:'lp1', date:'2026-04-10', workerName:'Rajesh Kumar', amountTaken:5000 },
+      { id:'lp2', date:'2026-05-01', workerName:'Suresh Pal', amountTaken:3000 }
+    ];
+
+    // Stock book
+    const INIT_GODOWN = [
+      { id:'g1', itemName:'Khal (Mustard Cake)', bags:140 },
+      { id:'g2', itemName:'Chana Churi', bags:85 },
+      { id:'g3', itemName:'Makai Crushed', bags:210 }
+    ];
+    const INIT_PURCHASES = [
+      { id:'pu1', date:'2026-05-15', broker:'Bajrang Feed', item:'Khal (Mustard Cake)', ratePerKg:32.5, weight:5000, bags:100, bagSize:50, freight:4500, freightPerKg:0.9, totalCost:167000 }
+    ];
+    const INIT_CONSUMPTION = [
+      { id:'co1', date:'2026-06-01', itemName:'Khal (Mustard Cake)', openingBags:150, consumedBags:10, closingBags:140 },
+      { id:'co2', date:'2026-06-01', itemName:'Chana Churi', openingBags:90, consumedBags:5, closingBags:85 }
+    ];
+    const INIT_DANA_PAY = [
+      { id:'dp1', date:'2026-05-20', broker:'Bajrang Feed', amount:100000 }
+    ];
+    // Medicine & misc accounts
+    const INIT_MEDICINE = [
+      { id:'med1', date:'2026-06-01', item:'Oxytocin', vendor:'City Pharma', amount:2500 }
+    ];
+
+    // ─────────────────────────────────────────────
+    //  PALAK / IRSHAD RATE CONFIG
+    // ─────────────────────────────────────────────
+    const INIT_RATES = {
+      nooraPerMonth: 3300,
+      tosifPerMonth: 3100,
+      irshadPerTaji: 3400,
+      irshadPerBakdi: 1800
+    };
+
+    // ─────────────────────────────────────────────
+    //  MAIN APP
+    // ─────────────────────────────────────────────
+    function App() {
+      const [tab, setTab] = useState('dashboard');
+      const [isDark, setIsDark] = useState(true);
+      useEffect(() => {
+        isDark ? document.body.classList.remove('light-theme') : document.body.classList.add('light-theme');
+      }, [isDark]);
+
+      // ── Global Data State ──
+      const [rates, setRates] = useState(INIT_RATES);
+      const [buffalo, setBuffalo] = useState(INIT_BUFFALO);
+      const [faliLog, setFaliLog] = useState(INIT_FALI);
+      const [koriLog, setKoriLog] = useState(INIT_KORI);
+      const [bhaisPayLog, setBhaisPayLog] = useState(INIT_BHAIS_PAY);
+      const [slaughtered, setSlaughtered] = useState(INIT_SLAUGHTERED);
+      const [deadLog, setDeadLog] = useState(INIT_DEAD);
+      const [tajiLog, setTajiLog] = useState(INIT_TAJI);
+      const [bakdiLog, setBakdiLog] = useState(INIT_BAKDI);
+      const [irshadPayLog, setIrshadPayLog] = useState(INIT_IRSHAD_PAY);
+      const [palakPayLog, setPalakPayLog] = useState(INIT_PALAK_PAY);
+
+      const [production, setProduction] = useState(INIT_PRODUCTION);
+      const [supply, setSupply] = useState(INIT_SUPPLY);
+      const [milkPayLog, setMilkPayLog] = useState(INIT_MILK_PAY);
+
+      const [labour, setLabour] = useState(INIT_LABOUR);
+      const [labPayLog, setLabPayLog] = useState(INIT_LAB_PAY);
+
+      const [godown, setGodown] = useState(INIT_GODOWN);
+      const [purchases, setPurchases] = useState(INIT_PURCHASES);
+      const [consumption, setConsumption] = useState(INIT_CONSUMPTION);
+      const [danaPayLog, setDanaPayLog] = useState(INIT_DANA_PAY);
+      const [medicineLog, setMedicineLog] = useState(INIT_MEDICINE);
+
+      const sharedProps = {
+        tab, setTab, isDark, setIsDark, rates, setRates,
+        buffalo, setBuffalo, faliLog, setFaliLog,
+        koriLog, setKoriLog, bhaisPayLog, setBhaisPayLog,
+        slaughtered, setSlaughtered, deadLog, setDeadLog,
+        tajiLog, setTajiLog, bakdiLog, setBakdiLog,
+        irshadPayLog, setIrshadPayLog, palakPayLog, setPalakPayLog,
+        production, setProduction, supply, setSupply,
+        milkPayLog, setMilkPayLog,
+        labour, setLabour, labPayLog, setLabPayLog,
+        godown, setGodown, purchases, setPurchases,
+        consumption, setConsumption, danaPayLog, setDanaPayLog,
+        medicineLog, setMedicineLog
+      };
+
+      return (
+        <div>
+          {tab === 'dashboard' && <DashboardBook {...sharedProps} />}
+          {tab === 'herd' && <HerdBook {...sharedProps} />}
+          {tab === 'milk' && <MilkBook {...sharedProps} />}
+          {tab === 'stock' && <StockBook {...sharedProps} />}
+          {tab === 'labour' && <LabourBook {...sharedProps} />}
+          {tab === 'accounts' && <AccountsBook {...sharedProps} />}
+          {tab === 'reports' && <ReportsBook {...sharedProps} />}
+          <BottomNav tab={tab} setTab={setTab} />
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  BOTTOM NAV
+    // ─────────────────────────────────────────────
+    function BottomNav({ tab, setTab }) {
+      const items = [
+        { key:'dashboard', icon:'📊', label:'Dashboard' },
+        { key:'herd',      icon:'🐃', label:'Herd' },
+        { key:'milk',      icon:'🥛', label:'Milk' },
+        { key:'stock',     icon:'🌾', label:'Stock' },
+        { key:'labour',    icon:'👷', label:'Labour' },
+        { key:'accounts',  icon:'💼', label:'Accounts' },
+        { key:'reports',   icon:'📋', label:'Reports' }
+      ];
+      return (
+        <div className="bottom-nav">
+          {items.map(it => (
+            <div key={it.key} className={`nav-item${tab===it.key?' active':''}`} onClick={()=>setTab(it.key)}>
+              <span className="nav-icon">{it.icon}</span>
+              <span className="nav-label">{it.label}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  HELPERS
+    // ─────────────────────────────────────────────
+    function daysBetween(d1, d2) {
+      const ms = new Date(d2) - new Date(d1);
+      return ms > 0 ? Math.floor(ms / 86400000) : 0;
+    }
+    function PageHeader({ title, sub, onTheme, isDark }) {
+      return (
+        <div className="app-header">
+          <div>
+            <div className="farm-title">{title}</div>
+            <div className="farm-sub">{sub}</div>
+          </div>
+          <button className="theme-btn" onClick={onTheme}>{isDark ? '☀️ Light' : '🌙 Dark'}</button>
+        </div>
+      );
+    }
+    function SectionDivider({ label }) {
+      return <div className="section-divider">{label}</div>;
+    }
+    function BackBtn({ onClick }) {
+      return <button className="back-btn" onClick={onClick}>◀ Back</button>;
+    }
+    function DelBtn({ onClick }) {
+      return <button className="del-btn" onClick={onClick}>Delete</button>;
+    }
+    function moneyFmt(n) { return (n||0).toLocaleString('en-IN'); }
+
+    // ─────────────────────────────────────────────
+    //  DASHBOARD BOOK — Master overview
+    // ─────────────────────────────────────────────
+    function DashboardBook(p) {
+      const [detail, setDetail] = useState(null);
+      const [showRates, setShowRates] = useState(false);
+      const [rateForm, setRateForm] = useState(p.rates);
+
+      // ── Compute herd counts ──
+      const activeBuffalo = p.buffalo.filter(b => !['Dead','Slaughtered'].includes(b.status) && !b.outgoingDate);
+      const shedA = activeBuffalo.filter(b => b.shed === 'Shed A').length;
+      const shedB = activeBuffalo.filter(b => b.shed === 'Shed B').length;
+      // Yard counts are represented in herd as Yard A / Yard B shed values
+      const yardA = activeBuffalo.filter(b => b.shed === 'Yard A').length;
+      const yardB = activeBuffalo.filter(b => b.shed === 'Yard B').length;
+      const nooraCount = activeBuffalo.filter(b => b.shed === 'Noora').length;
+      const tosifCount = activeBuffalo.filter(b => b.shed === 'Tosif').length;
+      const totalAnimals = shedA + shedB + yardA + yardB + nooraCount + tosifCount;
+
+      const tajiCame = p.tajiLog.length;
+      const bakdiGone = p.bakdiLog.length;
+      const koriCame = p.koriLog.reduce((s,k)=>s+k.animals,0);
+      const deadCount = p.deadLog.length;
+      const slaCount = p.slaughtered.length;
+
+      // fali counts
+      const faliShedA = p.faliLog.filter(f => f.shed === 'Shed A' && !f.doctorResult).length;
+      const faliShedB = p.faliLog.filter(f => f.shed === 'Shed B' && !f.doctorResult).length;
+
+      // avg per taji
+      const nooraAnimals = activeBuffalo.filter(b=>b.shed==='Noora').length;
+      const tosifAnimals = activeBuffalo.filter(b=>b.shed==='Tosif').length;
+      const nooraBill = nooraAnimals * p.rates.nooraPerMonth;
+      const tosifBill = tosifAnimals * p.rates.tosifPerMonth;
+      const irshadTajiBill = p.tajiLog.length * p.rates.irshadPerTaji;
+      const totalTajiCost = nooraBill + tosifBill + irshadTajiBill;
+      const avgPerTaji = tajiCame > 0 ? Math.round(totalTajiCost / tajiCame) : 0;
+
+      // avg per buffalo (kori+taji cost / count)
+      const koriTotal = p.koriLog.reduce((s,k)=>s+k.amount,0);
+      const tajiTotal = p.tajiLog.length * p.rates.irshadPerTaji;
+      const totalKoriTaji = koriTotal + tajiTotal;
+      const koriTajiCount = koriCame + tajiCame;
+      const avgPerBuffalo = koriTajiCount > 0 ? Math.round(totalKoriTaji / koriTajiCount) : 0;
+
+      // avg slaughtered
+      const slaTotal = p.slaughtered.reduce((s,sl)=>s+sl.amount,0);
+      const avgSla = slaCount > 0 ? Math.round(slaTotal / slaCount) : 0;
+
+      const cards = [
+        { label:'Total Animals', val:totalAnimals, unit:'Hd', color:'#10B981', detail:'TOTAL_ANIMALS' },
+        { label:'Shed A + Yard A', val:shedA+yardA, unit:'Hd', color:'#3B82F6', detail:'SHED_A' },
+        { label:'Shed B + Yard B', val:shedB+yardB, unit:'Hd', color:'#6366F1', detail:'SHED_B' },
+        { label:'Noora Stock', val:nooraCount, unit:'Hd', color:'#F59E0B', detail:'NOORA' },
+        { label:'Tosif Stock', val:tosifCount, unit:'Hd', color:'#EF4444', detail:'TOSIF' },
+        { label:'Taji Came', val:tajiCame, unit:'Hd', color:'#14B8A6', detail:'TAJI' },
+        { label:'Bakdi Gone', val:bakdiGone, unit:'Hd', color:'#8B5CF6', detail:'BAKDI' },
+        { label:'Kori Came', val:koriCame, unit:'Hd', color:'#EC4899', detail:'KORI' },
+        { label:'Dead', val:deadCount, unit:'Hd', color:'#6B7280', detail:'DEAD' },
+        { label:'Slaughtered', val:slaCount, unit:'Hd', color:'#DC2626', detail:'SLAUGHTERED' },
+        { label:'Avg/Taji Cost', val:`₹${moneyFmt(avgPerTaji)}`, unit:'', color:'#F97316', detail:'AVG_TAJI', noFormat:true },
+        { label:'Avg/Buffalo Cost', val:`₹${moneyFmt(avgPerBuffalo)}`, unit:'', color:'#A78BFA', detail:'AVG_BUF', noFormat:true },
+        { label:'Fali (A/B)', val:`${faliShedA}/${faliShedB}`, unit:'', color:'#2DD4BF', detail:'FALI_COUNT', noFormat:true },
+        { label:'Avg Slaughter Amt', val:`₹${moneyFmt(avgSla)}`, unit:'', color:'#F87171', detail:'AVG_SLA', noFormat:true }
+      ];
+
+      const renderDetail = () => {
+        if (!detail) return null;
+        let rows = [];
+        let title = '';
+        if (detail === 'TOTAL_ANIMALS') {
+          title = 'Total Animals Breakdown';
+          rows = [
+            {k:'Shed A',v:shedA},{k:'Yard A',v:yardA},{k:'Shed B',v:shedB},{k:'Yard B',v:yardB},
+            {k:'With Noora',v:nooraCount},{k:'With Tosif',v:tosifCount},{k:'TOTAL',v:totalAnimals}
+          ];
+        } else if (detail === 'SHED_A') {
+          title = 'Shed A + Yard A Animals';
+          rows = activeBuffalo.filter(b=>b.shed==='Shed A'||b.shed==='Yard A').map(b=>({k:b.tagId,v:b.khilaNo+' • '+b.status}));
+        } else if (detail === 'SHED_B') {
+          title = 'Shed B + Yard B Animals';
+          rows = activeBuffalo.filter(b=>b.shed==='Shed B'||b.shed==='Yard B').map(b=>({k:b.tagId,v:b.khilaNo+' • '+b.status}));
+        } else if (detail === 'NOORA') {
+          title = 'Noora Stock';
+          rows = activeBuffalo.filter(b=>b.shed==='Noora').map(b=>({k:b.tagId,v:b.status}));
+        } else if (detail === 'TOSIF') {
+          title = 'Tosif Stock';
+          rows = activeBuffalo.filter(b=>b.shed==='Tosif').map(b=>({k:b.tagId,v:b.status}));
+        } else if (detail === 'TAJI') {
+          title = 'Taji Records (Came to Mumbai)';
+          rows = p.tajiLog.map(t=>({k:t.tagId,v:t.date+' • '+t.palak+' • ₹'+moneyFmt(t.freight)}));
+        } else if (detail === 'BAKDI') {
+          title = 'Bakdi Records (Sent to Gujarat)';
+          rows = p.bakdiLog.map(b=>({k:b.tagId,v:b.date+' • '+b.palak+' • ₹'+moneyFmt(b.freight)}));
+        } else if (detail === 'KORI') {
+          title = 'Kori Purchases';
+          rows = p.koriLog.map(k=>({k:k.bhaisWala,v:k.date+' | '+k.animals+' Hd | ₹'+moneyFmt(k.amount)}));
+        } else if (detail === 'DEAD') {
+          title = 'Dead Animals';
+          rows = p.deadLog.map(d=>({k:d.tagId,v:d.outgoingDate+' • '+d.shed}));
+        } else if (detail === 'SLAUGHTERED') {
+          title = 'Slaughtered Animals';
+          rows = p.slaughtered.map(s=>({k:s.tagId,v:s.outgoingDate+' • ₹'+moneyFmt(s.amount)+' • '+s.kasaiName}));
+        } else if (detail === 'AVG_TAJI') {
+          title = 'Avg Cost Per Taji Calculation';
+          rows = [
+            {k:'Noora Buffalo',v:nooraAnimals+' Hd'},{k:'Noora Monthly Bill',v:'₹'+moneyFmt(nooraBill)},
+            {k:'Tosif Buffalo',v:tosifAnimals+' Hd'},{k:'Tosif Monthly Bill',v:'₹'+moneyFmt(tosifBill)},
+            {k:'Irshad Taji Freight',v:'₹'+moneyFmt(irshadTajiBill)},{k:'Total Taji Cost',v:'₹'+moneyFmt(totalTajiCost)},
+            {k:'Taji Count',v:tajiCame+' Hd'},{k:'Avg Per Taji',v:'₹'+moneyFmt(avgPerTaji)}
+          ];
+        } else if (detail === 'AVG_BUF') {
+          title = 'Avg Cost Per Buffalo (Kori+Taji)';
+          rows = [{k:'Total Kori Amount',v:'₹'+moneyFmt(koriTotal)},{k:'Total Taji Freight',v:'₹'+moneyFmt(tajiTotal)},
+            {k:'Total Cost',v:'₹'+moneyFmt(totalKoriTaji)},{k:'Animals Count',v:koriTajiCount+' Hd'},{k:'Avg Per Buffalo',v:'₹'+moneyFmt(avgPerBuffalo)}];
+        } else if (detail === 'FALI_COUNT') {
+          title = 'Fali Animals Pending Doctor Test';
+          rows = p.faliLog.filter(f=>!f.doctorResult).map(f=>({k:f.tagId,v:f.shed+' • Fali: '+f.faliDate}));
+        } else if (detail === 'AVG_SLA') {
+          title = 'Slaughtered Animals Amounts';
+          rows = p.slaughtered.map(s=>({k:s.tagId,v:'₹'+moneyFmt(s.amount)+' — '+s.kasaiName}));
+        }
+        return (
+          <div className="overlay" onClick={()=>setDetail(null)}>
+            <div className="modal-box" onClick={e=>e.stopPropagation()}>
+              <div className="modal-title">📊 {title}</div>
+              {rows.map((r,i)=>(
+                <div key={i} className="report-row"><span className="report-key">{r.k}</span><span className="report-val">{r.v}</span></div>
+              ))}
+              <button className="submit-btn" style={{marginTop:14,background:'var(--bg-back-btn)',color:'var(--primary)'}} onClick={()=>setDetail(null)}>Close</button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div>
+          <PageHeader title="Halima Dairy Farm" sub="Complete Management System" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+              <SectionDivider label="Farm Dashboard" />
+              <button className="back-btn" style={{marginTop:20}} onClick={()=>setShowRates(true)}>⚙️ Rates</button>
+            </div>
+
+            <div className="dash-grid-3">
+              {cards.map((c,i)=>(
+                <div key={i} className="d-card" style={{borderLeft:`4px solid ${c.color}`}} onClick={()=>setDetail(c.detail)}>
+                  <div className="d-card-left">
+                    <div className="d-label">{c.label}</div>
+                    {c.noFormat
+                      ? <div className="d-val-sm">{c.val}</div>
+                      : <div style={{display:'flex',alignItems:'baseline'}}>
+                          <span className="d-val">{c.val}</span>
+                          {c.unit && <span className="d-unit">{c.unit}</span>}
+                        </div>
+                    }
+                  </div>
+                  <span style={{fontSize:12,color:'var(--text-muted)'}}>➔</span>
+                </div>
+              ))}
+              {/* Doctor Button */}
+              <div className="d-card" style={{borderLeft:'4px solid #F59E0B',background:'linear-gradient(135deg,#1C1200,#2A1F00)'}} onClick={()=>p.setTab('herd')}>
+                <div className="d-card-left">
+                  <div className="d-label">Doctor's Page</div>
+                  <div className="d-val-sm" style={{color:'#FCD34D'}}>🩺 Open</div>
+                </div>
+                <span style={{fontSize:12,color:'#F59E0B'}}>➔</span>
+              </div>
+            </div>
+
+            {/* Delivery Matrix */}
+            <SectionDivider label="12-Month Expected Delivery Matrix" />
+            <DeliveryMatrix faliLog={p.faliLog} />
+
+            {/* Alerts */}
+            <SectionDivider label="System Alerts" />
+            <HerdAlerts buffalo={p.buffalo} faliLog={p.faliLog} />
+          </div>
+
+          {/* Rates Modal */}
+          {showRates && (
+            <div className="overlay" onClick={()=>setShowRates(false)}>
+              <div className="modal-box" onClick={e=>e.stopPropagation()}>
+                <div className="modal-title">⚙️ Rate Configuration</div>
+                {[
+                  ['nooraPerMonth','Noora Per Month (₹)'],
+                  ['tosifPerMonth','Tosif Per Month (₹)'],
+                  ['irshadPerTaji','Irshad Per Taji (₹)'],
+                  ['irshadPerBakdi','Irshad Per Bakdi (₹)']
+                ].map(([k,l])=>(
+                  <div key={k} className="input-row">
+                    <label className="field-lbl">{l}</label>
+                    <input type="number" className="farm-input" value={rateForm[k]}
+                      onChange={e=>setRateForm({...rateForm,[k]:Number(e.target.value)})} />
+                  </div>
+                ))}
+                <button className="submit-btn" onClick={()=>{p.setRates(rateForm);setShowRates(false);}}>Save Rates</button>
+              </div>
+            </div>
+          )}
+          {renderDetail()}
+        </div>
+      );
+    }
+
+    function DeliveryMatrix({ faliLog }) {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const counts = Array(12).fill(0);
+      faliLog.forEach(f => {
+        const fDate = new Date(f.faliDate);
+        // Expected delivery ~10 months after fali date
+        const delivDate = new Date(fDate);
+        delivDate.setMonth(delivDate.getMonth() + 10);
+        counts[delivDate.getMonth()]++;
+      });
+      return (
+        <div className="matrix-grid">
+          {months.map((m,i)=>(
+            <div key={m} className="matrix-cell">
+              <div className="matrix-month">{m}</div>
+              <div className="matrix-count">{counts[i]} Hd</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function HerdAlerts({ buffalo, faliLog }) {
+      const alerts = [];
+      const today = new Date(BASE_DATE);
+      // 60-day unserviced from incoming date
+      buffalo.filter(b=>!b.outgoingDate && !['Dead','Slaughtered'].includes(b.status)).forEach(b=>{
+        const days = daysBetween(b.incomingDate, BASE_DATE);
+        const hasFali = faliLog.some(f=>f.tagId===b.tagId);
+        if (days > 60 && !hasFali) {
+          alerts.push({ type:'warn', msg:`🐃 ${b.tagId} (${b.khilaNo}) — Not serviced in ${days} days from incoming date.` });
+        }
+      });
+      // 30-day khali not re-serviced
+      faliLog.filter(f=>f.doctorResult==='Khali').forEach(f=>{
+        const reServiced = faliLog.filter(ff=>ff.tagId===f.tagId && ff.faliDate > f.doctorDate);
+        if (reServiced.length===0) {
+          const days = daysBetween(f.doctorDate||f.faliDate, BASE_DATE);
+          if (days > 30) {
+            alerts.push({ type:'danger', msg:`🚨 ${f.tagId} — Khali since ${f.doctorDate||f.faliDate}. ${days} days without re-service.` });
+          }
+        }
+      });
+      if (alerts.length === 0) return (
+        <div className="alert-box alert-ok"><span className="alert-txt-ok">✅ All alerts clear. Farm operations normal.</span></div>
+      );
+      return alerts.map((a,i)=>(
+        <div key={i} className={`alert-box ${a.type==='danger'?'alert-danger':'alert-warn'}`}>
+          <span className={a.type==='danger'?'alert-txt':'alert-txt-warn'}>{a.msg}</span>
+        </div>
+      ));
+    }
+
+    // ─────────────────────────────────────────────
+    //  HERD BOOK
+    // ─────────────────────────────────────────────
+    function HerdBook(p) {
+      const [view, setView] = useState('DASHBOARD');
+      const [modal, setModal] = useState(null);
+
+      const activeBuffalo = p.buffalo.filter(b => !b.outgoingDate && !['Dead','Slaughtered'].includes(b.status));
+      const archivedBuffalo = p.buffalo.filter(b => b.outgoingDate || ['Dead','Slaughtered'].includes(b.status));
+
+      if (view === 'BUFFALO_ENTRY') return <BuffaloEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'FALI_ENTRY') return <FaliEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'KORI_ENTRY') return <KoriEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'SLAUGHTER_ENTRY') return <SlaughterEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'DEAD_ENTRY') return <DeadEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'TAJI_BAKDI') return <TajiBakdiEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'DOCTORS') return <DoctorsPage {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'BHAIS_PAY') return <BhaisPayPage {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'PALAK_PAY') return <PalakPayPage {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'HERD_LIST') return <HerdListPage {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'ARCHIVE') return <ArchivePage {...p} onBack={()=>setView('DASHBOARD')} />;
+
+      const shedCounts = {
+        'Shed A': activeBuffalo.filter(b=>b.shed==='Shed A').length,
+        'Shed B': activeBuffalo.filter(b=>b.shed==='Shed B').length,
+        'Yard A': activeBuffalo.filter(b=>b.shed==='Yard A').length,
+        'Yard B': activeBuffalo.filter(b=>b.shed==='Yard B').length,
+        'Noora': activeBuffalo.filter(b=>b.shed==='Noora').length,
+        'Tosif': activeBuffalo.filter(b=>b.shed==='Tosif').length,
+      };
+
+      return (
+        <div>
+          <PageHeader title="Herd Book" sub="Livestock Registry" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+
+            <SectionDivider label="Quick Actions" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Buffalo Entry',icon:'🐃',view:'BUFFALO_ENTRY',color:'#3B82F6'},
+                {label:'Fali / Service',icon:'🐂',view:'FALI_ENTRY',color:'#10B981'},
+                {label:'Add Kori',icon:'📥',view:'KORI_ENTRY',color:'#F59E0B'},
+                {label:'Taji / Bakdi',icon:'🚚',view:'TAJI_BAKDI',color:'#14B8A6'},
+                {label:'Slaughtered',icon:'🔪',view:'SLAUGHTER_ENTRY',color:'#EF4444'},
+                {label:'Dead Animals',icon:'💀',view:'DEAD_ENTRY',color:'#6B7280'},
+                {label:'🩺 Doctor Page',icon:'',view:'DOCTORS',color:'#F59E0B'},
+                {label:'Bhaiswala Ledger',icon:'💰',view:'BHAIS_PAY',color:'#A855F7'},
+                {label:'Palak Payments',icon:'👤',view:'PALAK_PAY',color:'#EC4899'},
+                {label:'Full Herd List',icon:'📋',view:'HERD_LIST',color:'#059669'},
+                {label:'Archive / History',icon:'📁',view:'ARCHIVE',color:'#64748B'},
+              ].map(btn=>(
+                <div key={btn.view} className="action-card" style={{background:`linear-gradient(135deg,${btn.color}22,${btn.color}44)`,border:`1px solid ${btn.color}55`}} onClick={()=>setView(btn.view)}>
+                  <div className="ac-label">Herd Book</div>
+                  <div className="ac-title">{btn.icon} {btn.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <SectionDivider label="Current Herd Summary" />
+            <div className="dash-grid-2">
+              {Object.entries(shedCounts).map(([shed,cnt])=>(
+                <div key={shed} className="d-card" style={{borderLeft:'4px solid var(--primary)'}}>
+                  <div className="d-card-left"><div className="d-label">{shed}</div><div className="d-val">{cnt}</div></div>
+                  <span className="d-unit">Hd</span>
+                </div>
+              ))}
+            </div>
+
+            <SectionDivider label="Palak Bills (Current Month)" />
+            <PalakBillSummary {...p} />
+
+            <SectionDivider label="System Alerts" />
+            <HerdAlerts buffalo={p.buffalo} faliLog={p.faliLog} />
+
+            <SectionDivider label="12-Month Delivery Matrix" />
+            <DeliveryMatrix faliLog={p.faliLog} />
+          </div>
+        </div>
+      );
+    }
+
+    function PalakBillSummary({ buffalo, rates, tajiLog }) {
+      const active = buffalo.filter(b=>!b.outgoingDate && !['Dead','Slaughtered'].includes(b.status));
+      const nooraCount = active.filter(b=>b.shed==='Noora').length;
+      const tosifCount = active.filter(b=>b.shed==='Tosif').length;
+      const nooraBill = nooraCount * rates.nooraPerMonth;
+      const tosifBill = tosifCount * rates.tosifPerMonth;
+      const irshadTajiBill = tajiLog.length * rates.irshadPerTaji;
+      return (
+        <div className="form-panel">
+          {[
+            {k:'Noora ('+nooraCount+' Hd × ₹'+rates.nooraPerMonth+')',v:'₹'+moneyFmt(nooraBill)},
+            {k:'Tosif ('+tosifCount+' Hd × ₹'+rates.tosifPerMonth+')',v:'₹'+moneyFmt(tosifBill)},
+            {k:'Irshad Taji Freight ('+tajiLog.length+' × ₹'+rates.irshadPerTaji+')',v:'₹'+moneyFmt(irshadTajiBill)},
+          ].map((r,i)=>(
+            <div key={i} className="report-row"><span className="report-key">{r.k}</span><span className="report-val green-val">{r.v}</span></div>
+          ))}
+        </div>
+      );
+    }
+
+    // ── Buffalo Entry ──
+    function BuffaloEntry({ buffalo, setBuffalo, onBack }) {
+      const [form, setForm] = useState({ tagId:'', khilaNo:'', shed:'Shed A', incomingDate:'', status:'Fali', lactationCycle:1 });
+      const submit = e => {
+        e.preventDefault();
+        if (buffalo.some(b=>b.tagId.toLowerCase()===form.tagId.trim().toLowerCase())) {
+          alert('Tag ID already exists!'); return;
+        }
+        setBuffalo(prev=>[...prev, { id:'b-'+Date.now(), ...form, tagId:form.tagId.trim().toUpperCase(), outgoingDate:'' }]);
+        alert('Buffalo registered: '+form.tagId);
+        setForm({ tagId:'', khilaNo:'', shed:'Shed A', incomingDate:'', status:'Fali', lactationCycle:1 });
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Buffalo Master Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Tag No</label>
+                  <input type="text" className="farm-input" required placeholder="e.g. KORI-201" value={form.tagId} onChange={e=>setForm({...form,tagId:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Khila No</label>
+                  <input type="text" className="farm-input" required placeholder="A-01" value={form.khilaNo} onChange={e=>setForm({...form,khilaNo:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Shed / Location</label>
+                  <select className="farm-select" value={form.shed} onChange={e=>setForm({...form,shed:e.target.value})}>
+                    {['Shed A','Shed B','Yard A','Yard B','Noora','Tosif'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Incoming Date</label>
+                  <input type="date" className="farm-input" required value={form.incomingDate} onChange={e=>setForm({...form,incomingDate:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Status</label>
+                  <select className="farm-select" value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
+                    {['Fali','Pregnant','Khali','Noora','Tosif'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Lactation Cycle</label>
+                  <input type="number" className="farm-input" min="1" value={form.lactationCycle} onChange={e=>setForm({...form,lactationCycle:Number(e.target.value)})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Register Buffalo</button>
+            </form>
+          </div>
+          <div className="form-panel">
+            <div className="panel-header">Active Buffalo List</div>
+            <div className="tbl-wrap">
+              <table className="data-table">
+                <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>In Date</th><th>Status</th><th>Days</th><th>Del</th></tr></thead>
+                <tbody>
+                  {buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)).map(b=>{
+                    const days = daysBetween(b.incomingDate, BASE_DATE);
+                    return (
+                      <tr key={b.id}>
+                        <td style={{fontWeight:700,color:'var(--primary)'}}>{b.tagId}</td>
+                        <td>{b.khilaNo}</td>
+                        <td>{b.shed}</td>
+                        <td>{b.incomingDate}</td>
+                        <td><span className={`badge ${b.status==='Pregnant'?'badge-green':b.status==='Fali'?'badge-amber':b.status==='Khali'?'badge-red':'badge-gray'}`}>{b.status}</span></td>
+                        <td>{days}d</td>
+                        <td><DelBtn onClick={()=>{if(window.confirm('Delete '+b.tagId+'?'))setBuffalo(prev=>prev.filter(x=>x.id!==b.id))}} /></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Fali Entry ──
+    function FaliEntry({ buffalo, faliLog, setFaliLog, onBack }) {
+      const [form, setForm] = useState({ tagId:'', shed:'Shed A', faliDate:'', bull:'Bull-1', doctorResult:'', doctorDate:'' });
+      const serviceCount = faliLog.filter(f=>f.tagId===form.tagId).length + 1;
+      const submit = e => {
+        e.preventDefault();
+        const entry = { id:'f-'+Date.now(), ...form, tagId:form.tagId.trim().toUpperCase(), serviceCount };
+        setFaliLog(prev=>[entry,...prev]);
+        alert('Fali entry saved. Service count: '+serviceCount);
+        setForm({ tagId:'', shed:'Shed A', faliDate:'', bull:'Bull-1', doctorResult:'', doctorDate:'' });
+      };
+      const updateDoctor = (id, result, date) => {
+        setFaliLog(prev=>prev.map(f=>f.id===id ? {...f,doctorResult:result,doctorDate:date} : f));
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Fali / Service Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Tag No</label>
+                  <input type="text" className="farm-input" required placeholder="Tag No" value={form.tagId} onChange={e=>setForm({...form,tagId:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Shed</label>
+                  <select className="farm-select" value={form.shed} onChange={e=>setForm({...form,shed:e.target.value})}>
+                    {['Shed A','Shed B'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Fali Date</label>
+                  <input type="date" className="farm-input" required value={form.faliDate} onChange={e=>setForm({...form,faliDate:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Bull Used</label>
+                  <input type="text" className="farm-input" value={form.bull} onChange={e=>setForm({...form,bull:e.target.value})} placeholder="Bull-1" /></div>
+              </div>
+              <div className="auto-hint">Service Count (Auto): {serviceCount}</div>
+              <button type="submit" className="submit-btn">Save Fali Entry</button>
+            </form>
+          </div>
+          <SectionDivider label="Fali Log — Set Doctor Result" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Shed</th><th>Fali Date</th><th>Svc#</th><th>Test Date (+50d)</th><th>Result</th><th>Del</th></tr></thead>
+              <tbody>
+                {faliLog.map(f=>{
+                  const testDate = f.faliDate ? new Date(new Date(f.faliDate).getTime()+50*86400000).toISOString().split('T')[0] : '';
+                  return (
+                    <tr key={f.id}>
+                      <td style={{fontWeight:700}}>{f.tagId}</td>
+                      <td>{f.shed}</td>
+                      <td>{f.faliDate}</td>
+                      <td>{f.serviceCount}</td>
+                      <td>{testDate}</td>
+                      <td>
+                        {f.doctorResult
+                          ? <span className={`badge ${f.doctorResult==='Pregnant'?'badge-green':'badge-red'}`}>{f.doctorResult}</span>
+                          : <span style={{display:'flex',gap:4}}>
+                              <button className="del-btn" style={{background:'#064E3B',color:'#6EE7B7',borderColor:'#065F46'}} onClick={()=>updateDoctor(f.id,'Pregnant',BASE_DATE)}>✅ Preg</button>
+                              <button className="del-btn" style={{background:'#7F1D1D',color:'#FCA5A5'}} onClick={()=>updateDoctor(f.id,'Khali',BASE_DATE)}>❌ Khali</button>
+                            </span>
+                        }
+                      </td>
+                      <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setFaliLog(prev=>prev.filter(x=>x.id!==f.id))}} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Kori Entry ──
+    function KoriEntry({ koriLog, setKoriLog, bhaisPayLog, setBhaisPayLog, onBack }) {
+      const [form, setForm] = useState({ date:'', bhaisWala:'', animals:'', amount:'' });
+      const avgPerBuffalo = form.animals && form.amount ? Math.round(Number(form.amount)/Number(form.animals)) : 0;
+      const submit = e => {
+        e.preventDefault();
+        setKoriLog(prev=>[...prev,{ id:'k-'+Date.now(), date:form.date||BASE_DATE, bhaisWala:form.bhaisWala, animals:Number(form.animals), amount:Number(form.amount) }]);
+        alert('Kori purchase saved.');
+        setForm({ date:'', bhaisWala:'', animals:'', amount:'' });
+      };
+      // bhais balance
+      const bhaisMap = {};
+      koriLog.forEach(k=>{ if(!bhaisMap[k.bhaisWala]) bhaisMap[k.bhaisWala]={purchased:0,paid:0}; bhaisMap[k.bhaisWala].purchased+=k.amount; });
+      bhaisPayLog.forEach(p=>{ if(!bhaisMap[p.bhaisWala]) bhaisMap[p.bhaisWala]={purchased:0,paid:0}; bhaisMap[p.bhaisWala].paid+=p.amount; });
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Add Kori (New Purchase)</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label>
+                  <input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Bhaiswala Name</label>
+                  <input type="text" className="farm-input" required value={form.bhaisWala} onChange={e=>setForm({...form,bhaisWala:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">No of Animals</label>
+                  <input type="number" className="farm-input" required value={form.animals} onChange={e=>setForm({...form,animals:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Total Amount (₹)</label>
+                  <input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+              </div>
+              <div className="auto-hint">Avg Per Buffalo (Auto): ₹{moneyFmt(avgPerBuffalo)}</div>
+              <button type="submit" className="submit-btn">Save Kori Purchase</button>
+            </form>
+          </div>
+          <SectionDivider label="Bhaiswala Outstanding" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Bhaiswala</th><th>Total Purchased</th><th>Paid</th><th>Balance</th></tr></thead>
+              <tbody>
+                {Object.entries(bhaisMap).map(([name,v])=>(
+                  <tr key={name}><td style={{fontWeight:700}}>{name}</td><td>₹{moneyFmt(v.purchased)}</td><td className="green-val">₹{moneyFmt(v.paid)}</td>
+                    <td className={v.purchased-v.paid>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(v.purchased-v.paid)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <SectionDivider label="Kori Purchase Log" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Bhaiswala</th><th>Animals</th><th>Amount</th><th>Avg</th><th>Del</th></tr></thead>
+              <tbody>
+                {koriLog.map(k=>(
+                  <tr key={k.id}><td>{k.date}</td><td style={{fontWeight:700}}>{k.bhaisWala}</td><td>{k.animals} Hd</td>
+                    <td className="green-val">₹{moneyFmt(k.amount)}</td><td>₹{moneyFmt(Math.round(k.amount/k.animals))}</td>
+                    <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setKoriLog(prev=>prev.filter(x=>x.id!==k.id))}} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Bhaiswala Payment Page ──
+    function BhaisPayPage({ koriLog, bhaisPayLog, setBhaisPayLog, onBack }) {
+      const [form, setForm] = useState({ date:'', bhaisWala:'', amount:'' });
+      const bhaisMap = {};
+      koriLog.forEach(k=>{ if(!bhaisMap[k.bhaisWala]) bhaisMap[k.bhaisWala]={purchased:0,paid:0}; bhaisMap[k.bhaisWala].purchased+=k.amount; });
+      bhaisPayLog.forEach(p=>{ if(!bhaisMap[p.bhaisWala]) bhaisMap[p.bhaisWala]={purchased:0,paid:0}; bhaisMap[p.bhaisWala].paid+=p.amount; });
+      const selectedBalance = form.bhaisWala && bhaisMap[form.bhaisWala] ? bhaisMap[form.bhaisWala].purchased - bhaisMap[form.bhaisWala].paid : 0;
+      const submit = e => {
+        e.preventDefault();
+        setBhaisPayLog(prev=>[...prev,{id:'bp-'+Date.now(),date:form.date||BASE_DATE,bhaisWala:form.bhaisWala,amount:Number(form.amount)}]);
+        alert('Payment saved.');
+        setForm({date:'',bhaisWala:'',amount:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Bhaiswala Payment</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label>
+                  <input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Bhaiswala</label>
+                  <input type="text" className="farm-input" required value={form.bhaisWala} onChange={e=>setForm({...form,bhaisWala:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Amount Paid (₹)</label>
+                  <input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Outstanding (Auto)</label>
+                  <input type="text" className="farm-input" disabled value={'₹'+moneyFmt(selectedBalance)} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Payment</button>
+            </form>
+          </div>
+          <SectionDivider label="Payment History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Bhaiswala</th><th>Amount</th><th>Del</th></tr></thead>
+              <tbody>
+                {bhaisPayLog.map(p=>(
+                  <tr key={p.id}><td>{p.date}</td><td style={{fontWeight:700}}>{p.bhaisWala}</td>
+                    <td className="green-val">₹{moneyFmt(p.amount)}</td>
+                    <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setBhaisPayLog(prev=>prev.filter(x=>x.id!==p.id))}} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Taji / Bakdi Entry ──
+    function TajiBakdiEntry({ tajiLog, setTajiLog, bakdiLog, setBakdiLog, rates, onBack }) {
+      const [tajiForm, setTajiForm] = useState({ date:'', tagId:'', palak:'Noora' });
+      const [bakdiForm, setBakdiForm] = useState({ date:'', tagId:'', palak:'Noora' });
+      const submitTaji = e => {
+        e.preventDefault();
+        setTajiLog(prev=>[...prev,{id:'tj-'+Date.now(),...tajiForm,tagId:tajiForm.tagId.trim().toUpperCase(),freight:rates.irshadPerTaji}]);
+        alert('Taji entry saved. Freight: ₹'+rates.irshadPerTaji);
+        setTajiForm({date:'',tagId:'',palak:'Noora'});
+      };
+      const submitBakdi = e => {
+        e.preventDefault();
+        setBakdiLog(prev=>[...prev,{id:'bk-'+Date.now(),...bakdiForm,tagId:bakdiForm.tagId.trim().toUpperCase(),freight:rates.irshadPerBakdi}]);
+        alert('Bakdi entry saved. Freight: ₹'+rates.irshadPerBakdi);
+        setBakdiForm({date:'',tagId:'',palak:'Noora'});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Add Taji (Came to Mumbai)</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submitTaji}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={tajiForm.date} onChange={e=>setTajiForm({...tajiForm,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Tag No</label><input type="text" className="farm-input" required value={tajiForm.tagId} onChange={e=>setTajiForm({...tajiForm,tagId:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Palak</label>
+                  <select className="farm-select" value={tajiForm.palak} onChange={e=>setTajiForm({...tajiForm,palak:e.target.value})}>
+                    <option>Noora</option><option>Tosif</option>
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Irshad Freight (Auto)</label>
+                  <input type="text" className="farm-input" disabled value={'₹'+rates.irshadPerTaji} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Taji</button>
+            </form>
+          </div>
+          <div className="form-panel">
+            <div className="panel-header">Add Bakdi (Sent to Gujarat)</div>
+            <form onSubmit={submitBakdi}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={bakdiForm.date} onChange={e=>setBakdiForm({...bakdiForm,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Tag No</label><input type="text" className="farm-input" required value={bakdiForm.tagId} onChange={e=>setBakdiForm({...bakdiForm,tagId:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Palak</label>
+                  <select className="farm-select" value={bakdiForm.palak} onChange={e=>setBakdiForm({...bakdiForm,palak:e.target.value})}>
+                    <option>Noora</option><option>Tosif</option>
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Irshad Freight (Auto)</label>
+                  <input type="text" className="farm-input" disabled value={'₹'+rates.irshadPerBakdi} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Bakdi</button>
+            </form>
+          </div>
+          <SectionDivider label="Taji Log" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Tag</th><th>Palak</th><th>Freight</th><th>Del</th></tr></thead>
+              <tbody>{tajiLog.map(t=>(
+                <tr key={t.id}><td>{t.date}</td><td style={{fontWeight:700}}>{t.tagId}</td><td>{t.palak}</td><td>₹{moneyFmt(t.freight)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setTajiLog(prev=>prev.filter(x=>x.id!==t.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+          <SectionDivider label="Bakdi Log" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Tag</th><th>Palak</th><th>Freight</th><th>Del</th></tr></thead>
+              <tbody>{bakdiLog.map(b=>(
+                <tr key={b.id}><td>{b.date}</td><td style={{fontWeight:700}}>{b.tagId}</td><td>{b.palak}</td><td>₹{moneyFmt(b.freight)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setBakdiLog(prev=>prev.filter(x=>x.id!==b.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Palak Payment Page ──
+    function PalakPayPage({ palakPayLog, setPalakPayLog, onBack }) {
+      const [form, setForm] = useState({ date:'', palak:'Noora', amount:'', note:'' });
+      const submit = e => {
+        e.preventDefault();
+        setPalakPayLog(prev=>[...prev,{id:'pp-'+Date.now(),...form,amount:Number(form.amount)}]);
+        alert('Palak payment saved.');
+        setForm({date:'',palak:'Noora',amount:'',note:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Palak Monthly Payment</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Palak</label>
+                  <select className="farm-select" value={form.palak} onChange={e=>setForm({...form,palak:e.target.value})}>
+                    <option>Noora</option><option>Tosif</option><option>Irshad</option>
+                  </select></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Amount (₹)</label><input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Note / Month</label><input type="text" className="farm-input" value={form.note} onChange={e=>setForm({...form,note:e.target.value})} placeholder="e.g. June 2026" /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Payment</button>
+            </form>
+          </div>
+          <SectionDivider label="Palak Payment History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Palak</th><th>Amount</th><th>Note</th><th>Del</th></tr></thead>
+              <tbody>{palakPayLog.map(p=>(
+                <tr key={p.id}><td>{p.date}</td><td style={{fontWeight:700}}>{p.palak}</td>
+                  <td className="green-val">₹{moneyFmt(p.amount)}</td><td>{p.note}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setPalakPayLog(prev=>prev.filter(x=>x.id!==p.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Slaughter Entry ──
+    function SlaughterEntry({ slaughtered, setSlaughtered, buffalo, setBuffalo, onBack }) {
+      const [form, setForm] = useState({ tagId:'', khilaNo:'', shed:'Shed A', amount:'', kasaiName:'', outgoingDate:'' });
+      const tagMatch = buffalo.find(b=>b.tagId.toUpperCase()===form.tagId.trim().toUpperCase());
+      useEffect(()=>{ if(tagMatch){ setForm(f=>({...f,khilaNo:tagMatch.khilaNo,shed:tagMatch.shed})); } },[form.tagId]);
+      const submit = e => {
+        e.preventDefault();
+        const entry = {id:'sl-'+Date.now(),...form,tagId:form.tagId.trim().toUpperCase(),amount:Number(form.amount)};
+        setSlaughtered(prev=>[...prev,entry]);
+        if(tagMatch) setBuffalo(prev=>prev.map(b=>b.tagId===entry.tagId?{...b,status:'Slaughtered',outgoingDate:form.outgoingDate}:b));
+        alert('Slaughter record saved.');
+        setForm({tagId:'',khilaNo:'',shed:'Shed A',amount:'',kasaiName:'',outgoingDate:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Slaughtered Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Tag No</label><input type="text" className="farm-input" required value={form.tagId} onChange={e=>setForm({...form,tagId:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Khila No (Auto)</label><input type="text" className="farm-input" value={form.khilaNo} onChange={e=>setForm({...form,khilaNo:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Shed (Auto)</label>
+                  <select className="farm-select" value={form.shed} onChange={e=>setForm({...form,shed:e.target.value})}>
+                    {['Shed A','Shed B','Yard A','Yard B','Noora','Tosif'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Outgoing Date</label><input type="date" className="farm-input" required value={form.outgoingDate} onChange={e=>setForm({...form,outgoingDate:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Amount (₹)</label><input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Kasai Name</label><input type="text" className="farm-input" required value={form.kasaiName} onChange={e=>setForm({...form,kasaiName:e.target.value})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Slaughter Record</button>
+            </form>
+          </div>
+          <SectionDivider label="Slaughter Records" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>Date</th><th>Amount</th><th>Kasai</th><th>Del</th></tr></thead>
+              <tbody>{slaughtered.map(s=>(
+                <tr key={s.id}><td style={{fontWeight:700}}>{s.tagId}</td><td>{s.khilaNo}</td><td>{s.shed}</td>
+                  <td>{s.outgoingDate}</td><td className="green-val">₹{moneyFmt(s.amount)}</td><td>{s.kasaiName}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setSlaughtered(prev=>prev.filter(x=>x.id!==s.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Dead Entry ──
+    function DeadEntry({ deadLog, setDeadLog, buffalo, setBuffalo, onBack }) {
+      const [form, setForm] = useState({ tagId:'', khilaNo:'', shed:'Shed A', outgoingDate:'' });
+      const tagMatch = buffalo.find(b=>b.tagId.toUpperCase()===form.tagId.trim().toUpperCase());
+      useEffect(()=>{ if(tagMatch){ setForm(f=>({...f,khilaNo:tagMatch.khilaNo,shed:tagMatch.shed})); } },[form.tagId]);
+      const submit = e => {
+        e.preventDefault();
+        const entry = {id:'dd-'+Date.now(),...form,tagId:form.tagId.trim().toUpperCase()};
+        setDeadLog(prev=>[...prev,entry]);
+        if(tagMatch) setBuffalo(prev=>prev.map(b=>b.tagId===entry.tagId?{...b,status:'Dead',outgoingDate:form.outgoingDate}:b));
+        alert('Dead record saved.');
+        setForm({tagId:'',khilaNo:'',shed:'Shed A',outgoingDate:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Dead Animals Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Tag No</label><input type="text" className="farm-input" required value={form.tagId} onChange={e=>setForm({...form,tagId:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Khila No (Auto)</label><input type="text" className="farm-input" value={form.khilaNo} onChange={e=>setForm({...form,khilaNo:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Shed (Auto)</label>
+                  <select className="farm-select" value={form.shed} onChange={e=>setForm({...form,shed:e.target.value})}>
+                    {['Shed A','Shed B','Yard A','Yard B','Noora','Tosif'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+                <div className="input-row"><label className="field-lbl">Outgoing Date</label><input type="date" className="farm-input" required value={form.outgoingDate} onChange={e=>setForm({...form,outgoingDate:e.target.value})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Dead Record</button>
+            </form>
+          </div>
+          <SectionDivider label="Dead Animals Log" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>Outgoing Date</th><th>Del</th></tr></thead>
+              <tbody>{deadLog.map(d=>(
+                <tr key={d.id}><td style={{fontWeight:700}}>{d.tagId}</td><td>{d.khilaNo}</td><td>{d.shed}</td><td>{d.outgoingDate}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setDeadLog(prev=>prev.filter(x=>x.id!==d.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Doctors Page ──
+    function DoctorsPage({ buffalo, faliLog, setFaliLog, onBack }) {
+      const pending = faliLog.filter(f=>!f.doctorResult).sort((a,b)=>a.tagId.localeCompare(b.tagId));
+      const shedA = pending.filter(f=>f.shed==='Shed A');
+      const shedB = pending.filter(f=>f.shed==='Shed B');
+      const update = (id, result) => {
+        setFaliLog(prev=>prev.map(f=>f.id===id?{...f,doctorResult:result,doctorDate:BASE_DATE}:f));
+        alert('Doctor result saved: '+result);
+      };
+      const renderCard = f => {
+        const buf = buffalo.find(b=>b.tagId===f.tagId);
+        const testDate = f.faliDate ? new Date(new Date(f.faliDate).getTime()+50*86400000).toISOString().split('T')[0] : '';
+        return (
+          <div key={f.id} style={{background:'var(--bg-panel)',border:'1px solid var(--border-card)',borderRadius:8,padding:12,marginBottom:8}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+              <span style={{fontWeight:800,fontSize:14,color:'var(--primary)'}}>{f.tagId}</span>
+              <span className="badge badge-amber">{f.shed}</span>
+            </div>
+            <div style={{fontSize:12,color:'var(--text-muted)',marginBottom:4}}>Khila: {buf?.khilaNo||'—'} • Fali: {f.faliDate} • Test Due: {testDate}</div>
+            <div style={{fontSize:11,color:'var(--text-muted-dark)',marginBottom:8}}>Service Count: {f.serviceCount} • Bull: {f.bull}</div>
+            <div style={{display:'flex',gap:8}}>
+              <button className="submit-btn" style={{background:'#064E3B',color:'#6EE7B7',fontSize:11,padding:'8px 4px',flex:1}} onClick={()=>update(f.id,'Pregnant')}>✅ Pregnant</button>
+              <button className="submit-btn" style={{background:'#7F1D1D',color:'#FCA5A5',fontSize:11,padding:'8px 4px',flex:1}} onClick={()=>update(f.id,'Khali')}>❌ Khali</button>
+            </div>
+          </div>
+        );
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+            <h2 style={{color:'var(--primary)',fontWeight:800,fontSize:16,textTransform:'uppercase'}}>🩺 Doctor's Test Page</h2>
+            <BackBtn onClick={onBack} />
+          </div>
+          <SectionDivider label={`Shed A — ${shedA.length} Pending`} />
+          {shedA.length===0 ? <div className="alert-box alert-ok"><span className="alert-txt-ok">No pending tests in Shed A</span></div> : shedA.map(renderCard)}
+          <SectionDivider label={`Shed B — ${shedB.length} Pending`} />
+          {shedB.length===0 ? <div className="alert-box alert-ok"><span className="alert-txt-ok">No pending tests in Shed B</span></div> : shedB.map(renderCard)}
+        </div>
+      );
+    }
+
+    // ── Herd List ──
+    function HerdListPage({ buffalo, onBack }) {
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--primary)',fontWeight:800,fontSize:14,textTransform:'uppercase'}}>Full Herd Register</span>
+            <BackBtn onClick={onBack} />
+          </div>
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>In Date</th><th>Status</th><th>Cycle</th><th>Lactation Days</th></tr></thead>
+              <tbody>
+                {buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)).map(b=>{
+                  const lacDays = daysBetween(b.incomingDate, BASE_DATE);
+                  return (
+                    <tr key={b.id}>
+                      <td style={{fontWeight:700,color:'var(--primary)'}}>{b.tagId}</td>
+                      <td>{b.khilaNo}</td><td>{b.shed}</td><td>{b.incomingDate}</td>
+                      <td><span className={`badge ${b.status==='Pregnant'?'badge-green':b.status==='Fali'?'badge-amber':b.status==='Khali'?'badge-red':'badge-gray'}`}>{b.status}</span></td>
+                      <td>{b.lactationCycle}</td><td>{lacDays}d</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ── Archive Page ──
+    function ArchivePage({ buffalo, slaughtered, deadLog, onBack }) {
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--primary)',fontWeight:800,fontSize:14,textTransform:'uppercase'}}>Archive — Dead & Slaughtered</span>
+            <BackBtn onClick={onBack} />
+          </div>
+          <SectionDivider label="Slaughtered" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>Date</th><th>Amount</th><th>Kasai</th></tr></thead>
+              <tbody>{slaughtered.map(s=>(
+                <tr key={s.id}><td style={{fontWeight:700}}>{s.tagId}</td><td>{s.khilaNo}</td><td>{s.shed}</td>
+                  <td>{s.outgoingDate}</td><td className="green-val">₹{moneyFmt(s.amount)}</td><td>{s.kasaiName}</td></tr>
+              ))}</tbody>
+            </table>
+          </div>
+          <SectionDivider label="Dead Animals" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Tag</th><th>Khila</th><th>Shed</th><th>Date</th></tr></thead>
+              <tbody>{deadLog.map(d=>(
+                <tr key={d.id}><td style={{fontWeight:700}}>{d.tagId}</td><td>{d.khilaNo}</td><td>{d.shed}</td><td>{d.outgoingDate}</td></tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  MILK BOOK
+    // ─────────────────────────────────────────────
+    const FIXED_HERD = 192;
+    function MilkBook(p) {
+      const [view, setView] = useState('DASHBOARD');
+      const [opDate, setOpDate] = useState(BASE_DATE);
+      const [detail, setDetail] = useState(null);
+
+      if (view === 'PRODUCTION') return <ProductionEntry {...p} opDate={opDate} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'SUPPLY') return <SupplyEntry {...p} opDate={opDate} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'PAYMENT') return <MilkPaymentEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'BILL') return <BillGenerator {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'SUPPLY_TABLE') return <SupplyHistoryPage {...p} onBack={()=>setView('DASHBOARD')} />;
+
+      const todayProd = p.production.find(pr=>pr.date===opDate) || {shedAMorn:0,shedAEve:0,shedBMorn:0,shedBEve:0};
+      const shedATotal = (todayProd.shedAMorn||0)+(todayProd.shedAEve||0);
+      const shedBTotal = (todayProd.shedBMorn||0)+(todayProd.shedBEve||0);
+      const totalProd = shedATotal + shedBTotal;
+      const avgPerBuf = (totalProd/FIXED_HERD).toFixed(2);
+      const totalBill = p.supply.reduce((s,x)=>s+x.amount,0);
+      const totalRcvd = p.milkPayLog.reduce((s,x)=>s+x.amount,0);
+      const outstanding = totalBill - totalRcvd;
+
+      const renderDetail = () => {
+        if (!detail) return null;
+        let rows=[], title='';
+        if (detail==='TOTAL_PROD') { title='Herd Production History'; rows=p.production.map(pr=>({k:pr.date,v:(pr.shedAMorn+pr.shedAEve+pr.shedBMorn+pr.shedBEve)+' L'})); }
+        else if (detail==='SHED_A') { title='Shed A Production History'; rows=p.production.map(pr=>({k:pr.date,v:`Morn: ${pr.shedAMorn}L  Eve: ${pr.shedAEve}L  Total: ${pr.shedAMorn+pr.shedAEve}L`})); }
+        else if (detail==='SHED_B') { title='Shed B Production History'; rows=p.production.map(pr=>({k:pr.date,v:`Morn: ${pr.shedBMorn}L  Eve: ${pr.shedBEve}L  Total: ${pr.shedBMorn+pr.shedBEve}L`})); }
+        else if (detail==='BILL') { title='Total Bill Breakdown'; const cm={}; p.supply.forEach(s=>{if(!cm[s.customer])cm[s.customer]=0;cm[s.customer]+=s.amount;}); rows=Object.entries(cm).map(([c,v])=>({k:c,v:'₹'+moneyFmt(v)})); }
+        else if (detail==='RCVD') { title='Payments Received'; rows=p.milkPayLog.map(m=>({k:m.customer+' • '+m.date,v:'₹'+moneyFmt(m.amount)})); }
+        else if (detail==='OUT') { title='Outstanding per Customer'; const cm={},pm={}; p.supply.forEach(s=>{if(!cm[s.customer])cm[s.customer]=0;cm[s.customer]+=s.amount;}); p.milkPayLog.forEach(m=>{if(!pm[m.customer])pm[m.customer]=0;pm[m.customer]+=m.amount;}); rows=Object.keys(cm).map(c=>({k:c,v:'₹'+moneyFmt(cm[c]-(pm[c]||0))})); }
+        return (
+          <div className="overlay" onClick={()=>setDetail(null)}>
+            <div className="modal-box" onClick={e=>e.stopPropagation()}>
+              <div className="modal-title">🥛 {title}</div>
+              {rows.map((r,i)=><div key={i} className="report-row"><span className="report-key">{r.k}</span><span className="report-val">{r.v}</span></div>)}
+              <button className="submit-btn" style={{marginTop:14,background:'var(--bg-back-btn)',color:'var(--primary)'}} onClick={()=>setDetail(null)}>Close</button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div>
+          <div className="app-header">
+            <div><div className="farm-title">Milk Book</div><div className="farm-sub">Supply & Production</div></div>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <input type="date" style={{background:'var(--bg-input)',border:'1px solid var(--border-input)',padding:'6px 8px',borderRadius:8,color:'var(--text-main)',fontFamily:'inherit',fontSize:11,fontWeight:700}} value={opDate} onChange={e=>setOpDate(e.target.value)} />
+              <button className="theme-btn" onClick={()=>p.setIsDark(!p.isDark)}>{p.isDark?'☀️':'🌙'}</button>
+            </div>
+          </div>
+          <div className="scroll-page" style={{paddingTop:10}}>
+            <SectionDivider label="Production Dashboard" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Total Production',val:totalProd,unit:'L',color:'#10B981',det:'TOTAL_PROD'},
+                {label:'Avg / Buffalo (192)',val:avgPerBuf,unit:'L',color:'#3B82F6',det:'SHED_A'},
+                {label:'Shed A Total',val:shedATotal,unit:'L',color:'#A855F7',det:'SHED_A'},
+                {label:'Shed B Total',val:shedBTotal,unit:'L',color:'#A855F7',det:'SHED_B'},
+                {label:'Total Bill Amt',val:'₹'+moneyFmt(totalBill),unit:'',color:'#F59E0B',det:'BILL',noFmt:true},
+                {label:'Total Received',val:'₹'+moneyFmt(totalRcvd),unit:'',color:'#10B981',det:'RCVD',noFmt:true},
+                {label:'Outstanding',val:'₹'+moneyFmt(outstanding),unit:'',color:'#EF4444',det:'OUT',noFmt:true}
+              ].map((c,i)=>(
+                <div key={i} className="d-card" style={{borderLeft:`4px solid ${c.color}`}} onClick={()=>setDetail(c.det)}>
+                  <div className="d-card-left"><div className="d-label">{c.label}</div>
+                    <div className="d-val-sm" style={{color:c.color}}>{c.noFmt?c.val:<span>{c.val}<span className="d-unit"> {c.unit}</span></span>}</div>
+                  </div><span style={{fontSize:12,color:'var(--text-muted)'}}>➔</span>
+                </div>
+              ))}
+            </div>
+            <SectionDivider label="Quick Actions" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Enter Production',icon:'🥛',v:'PRODUCTION',color:'#10B981'},
+                {label:'Customer Supply',icon:'📦',v:'SUPPLY',color:'#3B82F6'},
+                {label:'Receive Payment',icon:'💰',v:'PAYMENT',color:'#F59E0B'},
+                {label:'Generate Bill',icon:'🧾',v:'BILL',color:'#EC4899'},
+                {label:'Supply History',icon:'📋',v:'SUPPLY_TABLE',color:'#8B5CF6'},
+              ].map(btn=>(
+                <div key={btn.v} className="action-card" style={{background:`linear-gradient(135deg,${btn.color}22,${btn.color}44)`,border:`1px solid ${btn.color}55`}} onClick={()=>setView(btn.v)}>
+                  <div className="ac-label">Milk Book</div>
+                  <div className="ac-title">{btn.icon} {btn.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {renderDetail()}
+        </div>
+      );
+    }
+
+    function ProductionEntry({ production, setProduction, opDate, onBack }) {
+      const existing = production.find(p=>p.date===opDate) || {};
+      const [am,setAm] = useState(existing.shedAMorn||'');
+      const [ae,setAe] = useState(existing.shedAEve||'');
+      const [bm,setBm] = useState(existing.shedBMorn||'');
+      const [be,setBe] = useState(existing.shedBEve||'');
+      const submit = e => {
+        e.preventDefault();
+        const entry = {date:opDate,shedAMorn:Number(am),shedAEve:Number(ae),shedBMorn:Number(bm),shedBEve:Number(be)};
+        setProduction(prev=>[...prev.filter(p=>p.date!==opDate),entry].sort((a,b)=>b.date.localeCompare(a.date)));
+        alert('Production saved for '+opDate);
+        onBack();
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Daily Production — {opDate}</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div style={{color:'var(--primary)',fontSize:11,fontWeight:800,marginBottom:6,textTransform:'uppercase'}}>Shed A</div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Morning (L)</label><input type="number" className="farm-input" required value={am} onChange={e=>setAm(e.target.value)} /></div>
+                <div className="input-row"><label className="field-lbl">Evening (L)</label><input type="number" className="farm-input" required value={ae} onChange={e=>setAe(e.target.value)} /></div>
+              </div>
+              <div style={{color:'var(--primary)',fontSize:11,fontWeight:800,margin:'10px 0 6px',textTransform:'uppercase'}}>Shed B</div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Morning (L)</label><input type="number" className="farm-input" required value={bm} onChange={e=>setBm(e.target.value)} /></div>
+                <div className="input-row"><label className="field-lbl">Evening (L)</label><input type="number" className="farm-input" required value={be} onChange={e=>setBe(e.target.value)} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Production</button>
+            </form>
+          </div>
+          <SectionDivider label="Production History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Shed A</th><th>Shed B</th><th>Total</th><th>Del</th></tr></thead>
+              <tbody>{production.map(pr=>(
+                <tr key={pr.date}><td>{pr.date}</td><td>{pr.shedAMorn+pr.shedAEve}L</td><td>{pr.shedBMorn+pr.shedBEve}L</td>
+                  <td style={{fontWeight:800,color:'var(--primary)'}}>{pr.shedAMorn+pr.shedAEve+pr.shedBMorn+pr.shedBEve}L</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete '+pr.date+'?'))setProduction(prev=>prev.filter(x=>x.date!==pr.date))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function SupplyEntry({ supply, setSupply, opDate, onBack }) {
+      const [form, setForm] = useState({ date:opDate, customer:'', mornLit:'', eveLit:'', rate:'' });
+      const total = (Number(form.mornLit)||0)+(Number(form.eveLit)||0);
+      const amt = total*(Number(form.rate)||0);
+      const getLastSupply = (cust) => supply.filter(s=>s.customer===cust).sort((a,b)=>b.date.localeCompare(a.date))[0];
+      useEffect(()=>{
+        if(form.customer){
+          const last = getLastSupply(form.customer);
+          if(last){ setForm(f=>({...f,eveLit:last.eveLit.toString(),rate:last.rate.toString()})); }
+        }
+      },[form.customer]);
+      const submit = e => {
+        e.preventDefault();
+        setSupply(prev=>[...prev,{id:'s-'+Date.now(),...form,mornLit:Number(form.mornLit),eveLit:Number(form.eveLit),rate:Number(form.rate),totalLiters:total,amount:amt}]);
+        alert('Supply entry saved.');
+        setForm({date:opDate,customer:'',mornLit:'',eveLit:'',rate:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Customer Supply Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Customer Name</label><input type="text" className="farm-input" required value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Morning (L)</label><input type="number" step="any" className="farm-input" required value={form.mornLit} onChange={e=>setForm({...form,mornLit:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Evening (L — Auto prev)</label><input type="number" step="any" className="farm-input" required value={form.eveLit} onChange={e=>setForm({...form,eveLit:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Rate ₹/L (Auto prev)</label><input type="number" step="0.5" className="farm-input" required value={form.rate} onChange={e=>setForm({...form,rate:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Total Amt (Auto)</label><input type="text" className="farm-input" disabled value={'₹'+moneyFmt(amt)+' ('+total+'L)'} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Supply Entry</button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    function MilkPaymentEntry({ supply, milkPayLog, setMilkPayLog, onBack }) {
+      const [form, setForm] = useState({ date:'', customer:'', amount:'' });
+      const customers = [...new Set(supply.map(s=>s.customer))];
+      const totalBilled = c => supply.filter(s=>s.customer===c).reduce((t,s)=>t+s.amount,0);
+      const totalPaid = c => milkPayLog.filter(m=>m.customer===c).reduce((t,m)=>t+m.amount,0);
+      const balance = form.customer ? totalBilled(form.customer)-totalPaid(form.customer) : 0;
+      const submit = e => {
+        e.preventDefault();
+        setMilkPayLog(prev=>[...prev,{id:'mp-'+Date.now(),...form,amount:Number(form.amount)}]);
+        alert('Payment saved.');
+        setForm({date:'',customer:'',amount:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Receive Customer Payment</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Customer</label>
+                  <select className="farm-select" value={form.customer} onChange={e=>setForm({...form,customer:e.target.value})}>
+                    <option value="">-- Select --</option>
+                    {customers.map(c=><option key={c}>{c}</option>)}
+                  </select></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Amount Received (₹)</label><input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Outstanding Balance (Auto)</label><input type="text" className="farm-input" disabled value={'₹'+moneyFmt(balance)} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Payment</button>
+            </form>
+          </div>
+          <SectionDivider label="Customer Balance Summary" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Customer</th><th>Total Billed</th><th>Paid</th><th>Outstanding</th></tr></thead>
+              <tbody>{customers.map(c=>(
+                <tr key={c}><td style={{fontWeight:700}}>{c}</td><td>₹{moneyFmt(totalBilled(c))}</td>
+                  <td className="green-val">₹{moneyFmt(totalPaid(c))}</td>
+                  <td className={totalBilled(c)-totalPaid(c)>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(totalBilled(c)-totalPaid(c))}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+          <SectionDivider label="Payment History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Customer</th><th>Amount</th><th>Del</th></tr></thead>
+              <tbody>{milkPayLog.map(m=>(
+                <tr key={m.id}><td>{m.date}</td><td style={{fontWeight:700}}>{m.customer}</td>
+                  <td className="green-val">₹{moneyFmt(m.amount)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setMilkPayLog(prev=>prev.filter(x=>x.id!==m.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function BillGenerator({ supply, milkPayLog, onBack }) {
+      const [cust, setCust] = useState('');
+      const [from, setFrom] = useState('2026-05-31');
+      const [to, setTo] = useState(BASE_DATE);
+      const [oldBalance, setOldBalance] = useState('');
+      const customers = [...new Set(supply.map(s=>s.customer))];
+      const getBill = () => {
+        if (!cust) return null;
+        const rows = supply.filter(s=>s.customer===cust && s.date>=from && s.date<=to).sort((a,b)=>a.date.localeCompare(b.date));
+        const currentTotal = rows.reduce((t,r)=>t+r.amount,0);
+        const oldBal = Number(oldBalance)||0;
+        const periodPayments = milkPayLog.filter(m=>m.customer===cust && m.date>=from && m.date<=to).reduce((t,m)=>t+m.amount,0);
+        const netAmount = oldBal + currentTotal - periodPayments;
+        return {rows, currentTotal, oldBal, periodPayments, netAmount};
+      };
+      const bill = getBill();
+      const shareWA = () => {
+        if (!bill || bill.rows.length===0) return alert('No data found.');
+        let msg = `🥛 *HALIMA DAIRY FARM — MILK BILL* 🥛\n👤 Customer: ${cust}\n📅 Period: ${from} → ${to}\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `Date | Morn | Eve | Total | Rate | Amount\n`;
+        bill.rows.forEach(r=>{ msg+=`${r.date} | ${r.mornLit}L | ${r.eveLit}L | ${r.totalLiters}L | ₹${r.rate} | ₹${moneyFmt(r.amount)}\n`; });
+        msg+=`━━━━━━━━━━━━━━━━━━━━━━\n🔹 Old Balance: ₹${moneyFmt(bill.oldBal)}\n🔹 Current Bill: ₹${moneyFmt(bill.currentTotal)}\n💸 Payments Received: ₹${moneyFmt(bill.periodPayments)}\n✨ *NET PAYABLE: ₹${moneyFmt(bill.netAmount)}*\n📞 Thank you! – Halima Dairy`;
+        window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Generate Customer Bill</span><BackBtn onClick={onBack} /></div>
+            <div className="input-row"><label className="field-lbl">Customer</label>
+              <select className="farm-select" value={cust} onChange={e=>setCust(e.target.value)}>
+                <option value="">-- Select Customer --</option>
+                {customers.map(c=><option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="grid-2">
+              <div className="input-row"><label className="field-lbl">From Date</label><input type="date" className="farm-input" value={from} onChange={e=>setFrom(e.target.value)} /></div>
+              <div className="input-row"><label className="field-lbl">To Date</label><input type="date" className="farm-input" value={to} onChange={e=>setTo(e.target.value)} /></div>
+            </div>
+            <div className="input-row"><label className="field-lbl">Old Balance (Manual ₹)</label><input type="number" className="farm-input" value={oldBalance} onChange={e=>setOldBalance(e.target.value)} placeholder="Enter previous balance" /></div>
+            <button className="submit-btn" style={{background:'#25D366',color:'#000'}} onClick={shareWA}>📲 Share Bill on WhatsApp</button>
+          </div>
+          {bill && bill.rows.length>0 && (
+            <div className="form-panel">
+              <div className="panel-header">Bill Preview — {cust}</div>
+              <div className="tbl-wrap">
+                <table className="data-table">
+                  <thead><tr><th>Date</th><th>Morning</th><th>Evening</th><th>Total</th><th>Rate</th><th>Amount</th></tr></thead>
+                  <tbody>{bill.rows.map(r=>(
+                    <tr key={r.id}><td>{r.date}</td><td>{r.mornLit}L</td><td>{r.eveLit}L</td>
+                      <td style={{fontWeight:700}}>{r.totalLiters}L</td><td>₹{r.rate}</td><td className="green-val">₹{moneyFmt(r.amount)}</td></tr>
+                  ))}</tbody>
+                </table>
+              </div>
+              <div style={{padding:'10px 0'}}>
+                {[['Old Balance','₹'+moneyFmt(bill.oldBal)],['Current Bill','₹'+moneyFmt(bill.currentTotal)],['Payments Received','₹'+moneyFmt(bill.periodPayments)],['NET PAYABLE','₹'+moneyFmt(bill.netAmount)]].map(([k,v],i)=>(
+                  <div key={i} className="report-row"><span className="report-key">{k}</span><span className="report-val" style={i===3?{color:'var(--primary)',fontSize:15}:{}}>{v}</span></div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function SupplyHistoryPage({ supply, setSupply, onBack }) {
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--primary)',fontWeight:800,fontSize:14,textTransform:'uppercase'}}>Supply History</span>
+            <BackBtn onClick={onBack} />
+          </div>
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Customer</th><th>Morn</th><th>Eve</th><th>Rate</th><th>Amt</th><th>Del</th></tr></thead>
+              <tbody>{supply.map(s=>(
+                <tr key={s.id}><td>{s.date}</td><td style={{fontWeight:700}}>{s.customer}</td>
+                  <td>{s.mornLit}L</td><td>{s.eveLit}L</td><td>₹{s.rate}</td>
+                  <td className="green-val">₹{moneyFmt(s.amount)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setSupply(prev=>prev.filter(x=>x.id!==s.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  STOCK BOOK
+    // ─────────────────────────────────────────────
+    function StockBook(p) {
+      const [view, setView] = useState('DASHBOARD');
+      const [detail, setDetail] = useState(null);
+
+      if (view === 'PURCHASE') return <PurchaseEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'CONSUME') return <ConsumptionEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'LEDGER') return <DanaLedger {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'GODOWN') return <GodownPage {...p} onBack={()=>setView('DASHBOARD')} />;
+
+      const analytics = useMemo(()=>{
+        const uniqueDays = [...new Set(p.consumption.map(c=>c.date))].length || 1;
+        const bagSizeMap = {};
+        p.purchases.forEach(pu=>{ bagSizeMap[pu.item?.toLowerCase()] = pu.bagSize || 50; });
+        let totalKg = 0;
+        p.consumption.forEach(c=>{ totalKg += c.consumedBags * (bagSizeMap[c.itemName?.toLowerCase()]||50); });
+        const dailyKg = parseFloat((totalKg/uniqueDays).toFixed(2));
+        const globalW = p.purchases.reduce((s,pu)=>s+pu.weight,0);
+        const globalC = p.purchases.reduce((s,pu)=>s+pu.totalCost,0);
+        const avgCostKg = globalW>0 ? parseFloat((globalC/globalW).toFixed(2)) : 0;
+        const totalAnimals = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)).length || 1;
+        const avgPerBuf = parseFloat((dailyKg/totalAnimals).toFixed(2));
+        let godownVal = 0;
+        p.godown.forEach(g=>{ const rate=(avgCostKg||33.5); const bagSize=(bagSizeMap[g.itemName?.toLowerCase()]||50); godownVal+=g.bags*bagSize*rate; });
+        const lowAlerts = [];
+        p.godown.forEach(g=>{
+          const logs = p.consumption.filter(c=>c.itemName?.toLowerCase()===g.itemName?.toLowerCase());
+          const totalConsumed = logs.reduce((s,c)=>s+c.consumedBags,0);
+          const avgDaily = totalConsumed/uniqueDays;
+          if(avgDaily>0 && g.bags < avgDaily*10) {
+            lowAlerts.push({item:g.itemName,bags:g.bags,runway:Math.round(g.bags/avgDaily)});
+          }
+        });
+        return {dailyKg,avgCostKg,avgPerBuf,godownVal:Math.round(godownVal),lowAlerts};
+      },[p.purchases,p.consumption,p.godown,p.buffalo]);
+
+      const renderDetail = () => {
+        if(!detail) return null;
+        let rows=[],title='';
+        if(detail==='DAILY'){title='Daily Feed Consumption'; rows=p.consumption.map(c=>({k:c.date+' • '+c.itemName,v:c.consumedBags+' Bags'}));}
+        else if(detail==='GODOWN'){title='Godown Stock'; rows=p.godown.map(g=>({k:g.itemName,v:g.bags+' Bags'}));}
+        return(
+          <div className="overlay" onClick={()=>setDetail(null)}>
+            <div className="modal-box" onClick={e=>e.stopPropagation()}>
+              <div className="modal-title">🌾 {title}</div>
+              {rows.map((r,i)=><div key={i} className="report-row"><span className="report-key">{r.k}</span><span className="report-val">{r.v}</span></div>)}
+              <button className="submit-btn" style={{marginTop:14,background:'var(--bg-back-btn)',color:'var(--primary)'}} onClick={()=>setDetail(null)}>Close</button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div>
+          <PageHeader title="Stock Book" sub="Feed & Godown" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+            <SectionDivider label="Analytics Dashboard" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Daily Feed (KG)',val:analytics.dailyKg,unit:'KG/Day',color:'#3B82F6',det:'DAILY'},
+                {label:'Avg Feed Cost',val:'₹'+analytics.avgCostKg,unit:'/KG',color:'#10B981',det:'DAILY',noFmt:true},
+                {label:'Avg Feed/Buffalo',val:analytics.avgPerBuf,unit:'KG/Hd',color:'#10B981',det:'DAILY'},
+                {label:'Godown Value',val:'₹'+moneyFmt(analytics.godownVal),unit:'',color:'#A855F7',det:'GODOWN',noFmt:true}
+              ].map((c,i)=>(
+                <div key={i} className="d-card" style={{borderLeft:`4px solid ${c.color}`}} onClick={()=>setDetail(c.det)}>
+                  <div className="d-card-left"><div className="d-label">{c.label}</div>
+                    <div className="d-val-sm">{c.noFmt?c.val:<span>{c.val}<span className="d-unit"> {c.unit}</span></span>}</div>
+                  </div><span style={{fontSize:12,color:'var(--text-muted)'}}>➔</span>
+                </div>
+              ))}
+            </div>
+            <SectionDivider label="Stock Alerts" />
+            {analytics.lowAlerts.length>0
+              ? analytics.lowAlerts.map((a,i)=>(
+                  <div key={i} className="alert-box alert-danger">
+                    <span className="alert-txt">🚨 <strong>{a.item}</strong> — Only {a.bags} bags left (~{a.runway} days runway)</span>
+                    <span className="alert-badge" style={{background:'#EF4444',color:'#fff'}}>REORDER</span>
+                  </div>
+                ))
+              : <div className="alert-box alert-ok"><span className="alert-txt-ok">✅ All stock levels stable — 10+ day runway confirmed.</span></div>
+            }
+            <SectionDivider label="Godown Stock" />
+            <div className="tbl-wrap">
+              <table className="data-table" style={{minWidth:0}}>
+                <thead><tr><th>Item</th><th>Bags</th></tr></thead>
+                <tbody>{p.godown.map(g=>(
+                  <tr key={g.id}><td style={{fontWeight:700}}>{g.itemName}</td>
+                    <td style={{color:'var(--primary)',fontWeight:800}}>{g.bags} Bags</td></tr>
+                ))}</tbody>
+              </table>
+            </div>
+            <SectionDivider label="Quick Actions" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Buy Feed',icon:'💼',v:'PURCHASE',color:'#D97706'},
+                {label:'Consumption',icon:'🌾',v:'CONSUME',color:'#3B82F6'},
+                {label:'Broker Ledger',icon:'📖',v:'LEDGER',color:'#A855F7'},
+                {label:'Manage Godown',icon:'🏪',v:'GODOWN',color:'#059669'},
+              ].map(btn=>(
+                <div key={btn.v} className="action-card" style={{background:`linear-gradient(135deg,${btn.color}22,${btn.color}44)`,border:`1px solid ${btn.color}55`}} onClick={()=>setView(btn.v)}>
+                  <div className="ac-label">Stock Book</div>
+                  <div className="ac-title">{btn.icon} {btn.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {renderDetail()}
+        </div>
+      );
+    }
+
+    function PurchaseEntry({ godown, setGodown, purchases, setPurchases, onBack }) {
+      const [form, setForm] = useState({date:'',broker:'',item:'',ratePerKg:'',weight:'',bags:'',freight:''});
+      const bagSize = form.weight && form.bags ? parseFloat((Number(form.weight)/Number(form.bags)).toFixed(2)) : 0;
+      const freightPerKg = form.freight && form.weight ? parseFloat((Number(form.freight)/Number(form.weight)).toFixed(2)) : 0;
+      const totalCost = (Number(form.ratePerKg)*Number(form.weight)) + Number(form.freight);
+      const submit = e => {
+        e.preventDefault();
+        const entry = {id:'pu-'+Date.now(),...form,ratePerKg:Number(form.ratePerKg),weight:Number(form.weight),bags:Number(form.bags),freight:Number(form.freight),bagSize,freightPerKg,totalCost};
+        setPurchases(prev=>[entry,...prev]);
+        setGodown(prev=>{
+          const idx = prev.findIndex(g=>g.itemName?.toLowerCase()===form.item?.toLowerCase());
+          if(idx!==-1) return prev.map((g,i)=>i===idx?{...g,bags:g.bags+Number(form.bags)}:g);
+          return [...prev,{id:'g-'+Date.now(),itemName:form.item,bags:Number(form.bags)}];
+        });
+        alert('Purchase saved. Bags added to godown.');
+        setForm({date:'',broker:'',item:'',ratePerKg:'',weight:'',bags:'',freight:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Feed Purchase Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Broker Name</label><input type="text" className="farm-input" required value={form.broker} onChange={e=>setForm({...form,broker:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Item Name</label><input type="text" className="farm-input" required value={form.item} onChange={e=>setForm({...form,item:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Rate/KG (₹)</label><input type="number" step="0.01" className="farm-input" required value={form.ratePerKg} onChange={e=>setForm({...form,ratePerKg:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Total Weight (KG)</label><input type="number" className="farm-input" required value={form.weight} onChange={e=>setForm({...form,weight:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">No of Bags</label><input type="number" className="farm-input" required value={form.bags} onChange={e=>setForm({...form,bags:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Bag Size (Auto)</label><input type="text" className="farm-input" disabled value={bagSize?bagSize+' KG':''} /></div>
+                <div className="input-row"><label className="field-lbl">Freight (₹)</label><input type="number" className="farm-input" required value={form.freight} onChange={e=>setForm({...form,freight:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Freight/KG (Auto)</label><input type="text" className="farm-input" disabled value={freightPerKg?'₹'+freightPerKg+'/KG':''} /></div>
+                <div className="input-row"><label className="field-lbl">Total Cost (Auto)</label><input type="text" className="farm-input" disabled value={totalCost?'₹'+moneyFmt(totalCost):''} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Purchase</button>
+            </form>
+          </div>
+          <SectionDivider label="Purchase History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Broker</th><th>Item</th><th>Bags</th><th>Total</th><th>Del</th></tr></thead>
+              <tbody>{purchases.map(pu=>(
+                <tr key={pu.id}><td>{pu.date}</td><td style={{fontWeight:700}}>{pu.broker}</td><td>{pu.item}</td>
+                  <td>{pu.bags}</td><td className="green-val">₹{moneyFmt(pu.totalCost)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?')){setGodown(prev=>prev.map(g=>g.itemName?.toLowerCase()===pu.item?.toLowerCase()?{...g,bags:Math.max(0,g.bags-pu.bags)}:g));setPurchases(prev=>prev.filter(x=>x.id!==pu.id));}}}/></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function ConsumptionEntry({ godown, setGodown, consumption, setConsumption, onBack }) {
+      const [form, setForm] = useState({date:'',itemName:'',consumedBags:''});
+      const matchedStock = godown.find(g=>g.itemName?.toLowerCase()===form.itemName?.toLowerCase());
+      const opening = matchedStock ? matchedStock.bags : 0;
+      const closing = opening - (Number(form.consumedBags)||0);
+      const submit = e => {
+        e.preventDefault();
+        if(!matchedStock){alert('Item not found in godown!');return;}
+        if(Number(form.consumedBags)>opening){alert('Insufficient stock!');return;}
+        const entry = {id:'co-'+Date.now(),...form,consumedBags:Number(form.consumedBags),openingBags:opening,closingBags:closing,itemName:matchedStock.itemName};
+        setConsumption(prev=>[entry,...prev]);
+        setGodown(prev=>prev.map(g=>g.itemName?.toLowerCase()===form.itemName?.toLowerCase()?{...g,bags:closing}:g));
+        alert('Consumption logged.');
+        setForm({date:'',itemName:'',consumedBags:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Daily Consumption</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Item Name</label><input type="text" className="farm-input" required value={form.itemName} onChange={e=>setForm({...form,itemName:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Opening Balance (Auto)</label><input type="text" className="farm-input" disabled value={opening+' Bags'} /></div>
+                <div className="input-row"><label className="field-lbl">Consumed (Bags)</label><input type="number" className="farm-input" required value={form.consumedBags} onChange={e=>setForm({...form,consumedBags:e.target.value})} /></div>
+              </div>
+              <div className="auto-hint">Closing Balance (Auto): {closing} Bags</div>
+              <button type="submit" className="submit-btn">Log Consumption</button>
+            </form>
+          </div>
+          <SectionDivider label="Consumption Log" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Item</th><th>Opening</th><th>Consumed</th><th>Closing</th><th>Del</th></tr></thead>
+              <tbody>{consumption.map(c=>(
+                <tr key={c.id}><td>{c.date}</td><td style={{fontWeight:700}}>{c.itemName}</td>
+                  <td>{c.openingBags}Bg</td><td className="red-val">-{c.consumedBags}Bg</td>
+                  <td className="green-val">{c.closingBags}Bg</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Restore bags?')){setGodown(prev=>prev.map(g=>g.itemName?.toLowerCase()===c.itemName?.toLowerCase()?{...g,bags:g.bags+c.consumedBags}:g));setConsumption(prev=>prev.filter(x=>x.id!==c.id));}}}/></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function DanaLedger({ purchases, danaPayLog, setDanaPayLog, onBack }) {
+      const [form, setForm] = useState({date:'',broker:'',amount:''});
+      const danaMap = {};
+      purchases.forEach(p=>{ if(!danaMap[p.broker])danaMap[p.broker]={purchased:0,paid:0}; danaMap[p.broker].purchased+=p.totalCost; });
+      danaPayLog.forEach(p=>{ if(!danaMap[p.broker])danaMap[p.broker]={purchased:0,paid:0}; danaMap[p.broker].paid+=p.amount; });
+      const submit = e => {
+        e.preventDefault();
+        setDanaPayLog(prev=>[...prev,{id:'dp-'+Date.now(),date:form.date||BASE_DATE,broker:form.broker,amount:Number(form.amount)}]);
+        alert('Payment saved.');
+        setForm({date:'',broker:'',amount:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Dana Wala (Broker) Ledger</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Broker Name</label><input type="text" className="farm-input" required value={form.broker} onChange={e=>setForm({...form,broker:e.target.value})} /></div>
+              </div>
+              <div className="input-row"><label className="field-lbl">Amount Paid (₹)</label><input type="number" className="farm-input" required value={form.amount} onChange={e=>setForm({...form,amount:e.target.value})} /></div>
+              <button type="submit" className="submit-btn">Save Payment</button>
+            </form>
+          </div>
+          <SectionDivider label="Broker Outstanding" />
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Broker</th><th>Purchased</th><th>Paid</th><th>Balance</th></tr></thead>
+              <tbody>{Object.entries(danaMap).map(([name,v])=>(
+                <tr key={name}><td style={{fontWeight:700}}>{name}</td><td>₹{moneyFmt(v.purchased)}</td>
+                  <td className="green-val">₹{moneyFmt(v.paid)}</td>
+                  <td className={v.purchased-v.paid>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(v.purchased-v.paid)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+          <SectionDivider label="Payment History" />
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Date</th><th>Broker</th><th>Amount</th><th>Del</th></tr></thead>
+              <tbody>{danaPayLog.map(p=>(
+                <tr key={p.id}><td>{p.date}</td><td style={{fontWeight:700}}>{p.broker}</td>
+                  <td className="green-val">₹{moneyFmt(p.amount)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setDanaPayLog(prev=>prev.filter(x=>x.id!==p.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function GodownPage({ godown, setGodown, onBack }) {
+      const [form, setForm] = useState({itemName:'',bags:''});
+      const submit = e => {
+        e.preventDefault();
+        const idx = godown.findIndex(g=>g.itemName?.toLowerCase()===form.itemName?.toLowerCase());
+        if(idx!==-1){
+          setGodown(prev=>prev.map((g,i)=>i===idx?{...g,bags:Number(form.bags)}:g));
+          alert('Godown updated.');
+        } else {
+          setGodown(prev=>[...prev,{id:'g-'+Date.now(),itemName:form.itemName,bags:Number(form.bags)}]);
+          alert('Item added to godown.');
+        }
+        setForm({itemName:'',bags:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Manage Godown Stock</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Item Name</label><input type="text" className="farm-input" required value={form.itemName} onChange={e=>setForm({...form,itemName:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Bags</label><input type="number" className="farm-input" required value={form.bags} onChange={e=>setForm({...form,bags:e.target.value})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Add / Update Item</button>
+            </form>
+          </div>
+          <SectionDivider label="Current Godown" />
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Item</th><th>Bags</th><th>Del</th></tr></thead>
+              <tbody>{godown.map(g=>(
+                <tr key={g.id}><td style={{fontWeight:700}}>{g.itemName}</td>
+                  <td style={{color:'var(--primary)',fontWeight:800}}>{g.bags}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setGodown(prev=>prev.filter(x=>x.id!==g.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  LABOUR BOOK
+    // ─────────────────────────────────────────────
+    function LabourBook(p) {
+      const [view, setView] = useState('DASHBOARD');
+      const [workerModal, setWorkerModal] = useState(null);
+      const [detail, setDetail] = useState(null);
+
+      if (view === 'WORKERS') return <WorkerEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+      if (view === 'PAYMENTS') return <LabPaymentEntry {...p} onBack={()=>setView('DASHBOARD')} />;
+
+      const analytics = useMemo(()=>{
+        let totalPagar=0, totalBalance=0, totalAdvance=0;
+        const advAlerts=[];
+        const profiles = p.labour.map(w=>{
+          totalPagar += w.pagarPerMonth;
+          const endDate = w.leavingDate || BASE_DATE;
+          const daysWorked = daysBetween(w.joiningDate, endDate);
+          const earned = parseFloat(((w.pagarPerMonth/30)*daysWorked).toFixed(2));
+          const draws = p.labPayLog.filter(lp=>lp.workerName?.toLowerCase()===w.workerName?.toLowerCase()).reduce((s,lp)=>s+lp.amountTaken,0);
+          const net = earned - (w.oldAdvance + draws);
+          let balance=0, advance=0;
+          if(net<0){advance=Math.abs(net);totalAdvance+=advance;advAlerts.push({name:w.workerName,amount:Math.round(advance)});}
+          else{balance=net;totalBalance+=balance;}
+          return {...w,daysWorked,earned,draws,balance:Math.round(balance),advance:Math.round(advance)};
+        });
+        const activeCount = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)).length||1;
+        return {totalPagar,totalBalance:Math.round(totalBalance),totalAdvance:Math.round(totalAdvance),avgPerAnimal:parseFloat((totalPagar/activeCount).toFixed(2)),advAlerts,profiles};
+      },[p.labour,p.labPayLog,p.buffalo]);
+
+      const autoAdvance = name => {
+        if(!name.trim()) return 0;
+        const prof = analytics.profiles.find(pr=>pr.workerName?.toLowerCase()===name.trim().toLowerCase());
+        return prof ? prof.advance : 0;
+      };
+
+      const renderDetail = () => {
+        if(!detail) return null;
+        let rows=[],title='';
+        if(detail==='TOTAL_PAGAR'){title='Total Pagar Breakdown';rows=p.labour.map(w=>({k:w.workerName,v:'₹'+moneyFmt(w.pagarPerMonth)+'/Mo'}));}
+        else if(detail==='AVG_PAGAR'){title='Avg Pagar Per Animal';rows=[{k:'Total Pagar',v:'₹'+moneyFmt(analytics.totalPagar)},{k:'Active Animals',v:p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)).length+'Hd'},{k:'Avg/Animal',v:'₹'+analytics.avgPerAnimal}];}
+        else if(detail==='BALANCE'){title='Workers in Balance (Owed)';rows=analytics.profiles.filter(pr=>pr.balance>0).map(pr=>({k:pr.workerName,v:'₹'+moneyFmt(pr.balance)}));}
+        else if(detail==='ADVANCE'){title='Workers in Advance (Overdraft)';rows=analytics.profiles.filter(pr=>pr.advance>0).map(pr=>({k:pr.workerName,v:'₹'+moneyFmt(pr.advance)+' ADVANCE'}));}
+        return(
+          <div className="overlay" onClick={()=>setDetail(null)}>
+            <div className="modal-box" onClick={e=>e.stopPropagation()}>
+              <div className="modal-title">👷 {title}</div>
+              {rows.map((r,i)=><div key={i} className="report-row"><span className="report-key">{r.k}</span><span className="report-val">{r.v}</span></div>)}
+              <button className="submit-btn" style={{marginTop:14,background:'var(--bg-back-btn)',color:'var(--primary)'}} onClick={()=>setDetail(null)}>Close</button>
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div>
+          <PageHeader title="Labour Book" sub="Payroll & Advance Management" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+            <SectionDivider label="Labour Dashboard" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Total Workers Pagar',val:'₹'+moneyFmt(analytics.totalPagar),unit:'/Mo',color:'#10B981',det:'TOTAL_PAGAR',noFmt:true},
+                {label:'Avg Pagar/Animal',val:'₹'+analytics.avgPerAnimal,unit:'/Hd',color:'#F59E0B',det:'AVG_PAGAR',noFmt:true},
+                {label:'Pagar Balance Due',val:'₹'+moneyFmt(analytics.totalBalance),unit:'',color:'#3B82F6',det:'BALANCE',noFmt:true},
+                {label:'Pagar Advance',val:'₹'+moneyFmt(analytics.totalAdvance),unit:'',color:'#EF4444',det:'ADVANCE',noFmt:true}
+              ].map((c,i)=>(
+                <div key={i} className="d-card" style={{borderLeft:`4px solid ${c.color}`}} onClick={()=>setDetail(c.det)}>
+                  <div className="d-card-left"><div className="d-label">{c.label}</div>
+                    <div className="d-val-sm" style={{color:c.color}}>{c.val}</div>
+                    {c.unit&&<div className="d-unit">{c.unit}</div>}
+                  </div><span style={{fontSize:12,color:'var(--text-muted)'}}>➔</span>
+                </div>
+              ))}
+            </div>
+
+            {analytics.advAlerts.length>0 && <>
+              <SectionDivider label="Advance Alerts" />
+              {analytics.advAlerts.map((a,i)=>(
+                <div key={i} className="alert-box alert-danger">
+                  <span className="alert-txt">🚨 <strong>{a.name}</strong> is running advance of ₹{moneyFmt(a.amount)}</span>
+                  <span className="alert-badge" style={{background:'#EF4444',color:'#fff'}}>ADVANCE</span>
+                </div>
+              ))}
+            </>}
+
+            <SectionDivider label="Quick Actions" />
+            <div className="dash-grid-2">
+              <div className="action-card" style={{background:'linear-gradient(135deg,#10B98122,#10B98144)',border:'1px solid #10B98155'}} onClick={()=>setView('WORKERS')}>
+                <div className="ac-label">Labour Book</div><div className="ac-title">👷 Worker Register</div>
+              </div>
+              <div className="action-card" style={{background:'linear-gradient(135deg,#3B82F622,#3B82F644)',border:'1px solid #3B82F655'}} onClick={()=>setView('PAYMENTS')}>
+                <div className="ac-label">Labour Book</div><div className="ac-title">💰 Payment Entry</div>
+              </div>
+            </div>
+
+            <SectionDivider label="Worker Status Table" />
+            <div className="tbl-wrap">
+              <table className="data-table">
+                <thead><tr><th>Name</th><th>Shed</th><th>Days</th><th>Earned</th><th>Advance/Balance</th><th>Detail</th></tr></thead>
+                <tbody>{analytics.profiles.map(pr=>(
+                  <tr key={pr.id}>
+                    <td style={{fontWeight:700}}>{pr.workerName}</td>
+                    <td>{pr.shed}</td>
+                    <td>{pr.daysWorked}d</td>
+                    <td>₹{moneyFmt(Math.round(pr.earned))}</td>
+                    <td style={{fontWeight:800,color:pr.advance>0?'#EF4444':'var(--primary)'}}>
+                      {pr.advance>0?'ADV ₹'+moneyFmt(pr.advance):'BAL ₹'+moneyFmt(pr.balance)}
+                    </td>
+                    <td><button className="del-btn" style={{background:'#1A2E28',color:'#6EE7B7',borderColor:'#065F46'}} onClick={()=>setWorkerModal(pr)}>View</button></td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </div>
+
+          {workerModal && (
+            <div className="overlay" onClick={()=>setWorkerModal(null)}>
+              <div className="modal-box" onClick={e=>e.stopPropagation()}>
+                <div className="modal-title">🗂️ Worker Details — {workerModal.workerName}</div>
+                {[
+                  ['Shed',workerModal.shed],['Joining Date',workerModal.joiningDate],
+                  ['Leaving Date',workerModal.leavingDate||'Active'],['Days Worked',workerModal.daysWorked+' Days'],
+                  ['Pagar/Month','₹'+moneyFmt(workerModal.pagarPerMonth)],['Gross Earned','₹'+moneyFmt(Math.round(workerModal.earned))],
+                  ['Old Advance','₹'+moneyFmt(workerModal.oldAdvance)],['New Draws','₹'+moneyFmt(workerModal.draws)],
+                  [workerModal.advance>0?'ADVANCE OVERDRAFT':'BALANCE DUE',workerModal.advance>0?'₹'+moneyFmt(workerModal.advance):'₹'+moneyFmt(workerModal.balance)]
+                ].map(([k,v],i)=>(
+                  <div key={i} className="report-row" style={i===8?{borderTop:'1px solid var(--border-card)',paddingTop:8}:{}}>
+                    <span className="report-key">{k}</span>
+                    <span className="report-val" style={i===8?{color:workerModal.advance>0?'#EF4444':'var(--primary)',fontSize:14}:{}}>{v}</span>
+                  </div>
+                ))}
+                <button className="submit-btn" style={{marginTop:14,background:'var(--bg-back-btn)',color:'var(--primary)'}} onClick={()=>setWorkerModal(null)}>Close</button>
+              </div>
+            </div>
+          )}
+          {renderDetail()}
+        </div>
+      );
+    }
+
+    function WorkerEntry({ labour, setLabour, labPayLog, setLabPayLog, onBack }) {
+      const [form, setForm] = useState({workerName:'',joiningDate:'',oldAdvance:'',leavingDate:'',pagarPerMonth:'',shed:'Shed A'});
+      const submit = e => {
+        e.preventDefault();
+        if(labour.some(l=>l.workerName?.toLowerCase()===form.workerName.trim().toLowerCase())){alert('Worker already exists!');return;}
+        setLabour(prev=>[...prev,{id:'l-'+Date.now(),...form,oldAdvance:Number(form.oldAdvance)||0,pagarPerMonth:Number(form.pagarPerMonth)||0}]);
+        alert('Worker registered: '+form.workerName);
+        setForm({workerName:'',joiningDate:'',oldAdvance:'',leavingDate:'',pagarPerMonth:'',shed:'Shed A'});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Worker Registration</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Worker Name</label><input type="text" className="farm-input" required value={form.workerName} onChange={e=>setForm({...form,workerName:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Shed</label>
+                  <select className="farm-select" value={form.shed} onChange={e=>setForm({...form,shed:e.target.value})}>
+                    {['Shed A','Shed B','Yard A','Yard B'].map(s=><option key={s}>{s}</option>)}
+                  </select></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Joining Date</label><input type="date" className="farm-input" required value={form.joiningDate} onChange={e=>setForm({...form,joiningDate:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Leaving Date</label><input type="date" className="farm-input" value={form.leavingDate} onChange={e=>setForm({...form,leavingDate:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Pagar/Month (₹)</label><input type="number" className="farm-input" required value={form.pagarPerMonth} onChange={e=>setForm({...form,pagarPerMonth:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Old Advance (₹)</label><input type="number" className="farm-input" value={form.oldAdvance} onChange={e=>setForm({...form,oldAdvance:e.target.value})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Register Worker</button>
+            </form>
+          </div>
+          <SectionDivider label="Worker List" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Name</th><th>Shed</th><th>Joined</th><th>Pagar</th><th>Status</th><th>Del</th></tr></thead>
+              <tbody>{labour.map(w=>(
+                <tr key={w.id}><td style={{fontWeight:700}}>{w.workerName}</td><td>{w.shed}</td>
+                  <td>{w.joiningDate}</td><td>₹{moneyFmt(w.pagarPerMonth)}</td>
+                  <td><span className={`badge ${w.leavingDate?'badge-red':'badge-green'}`}>{w.leavingDate?'Left':'Active'}</span></td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete '+w.workerName+'?')){setLabour(prev=>prev.filter(x=>x.id!==w.id));setLabPayLog(prev=>prev.filter(x=>x.workerName?.toLowerCase()!==w.workerName?.toLowerCase()));}}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function LabPaymentEntry({ labour, labPayLog, setLabPayLog, onBack }) {
+      const [form, setForm] = useState({date:'',workerName:'',amountTaken:''});
+      const workers = labour.map(l=>l.workerName);
+      const submit = e => {
+        e.preventDefault();
+        setLabPayLog(prev=>[{id:'lp-'+Date.now(),...form,amountTaken:Number(form.amountTaken)},...prev]);
+        alert('Payment logged.');
+        setForm({date:'',workerName:'',amountTaken:''});
+      };
+      return (
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Labour Payment Entry</span><BackBtn onClick={onBack} /></div>
+            <form onSubmit={submit}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={form.date} onChange={e=>setForm({...form,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Worker Name</label>
+                  <select className="farm-select" value={form.workerName} onChange={e=>setForm({...form,workerName:e.target.value})}>
+                    <option value="">-- Select --</option>
+                    {workers.map(w=><option key={w}>{w}</option>)}
+                  </select></div>
+              </div>
+              <div className="input-row"><label className="field-lbl">Amount Taken (₹)</label><input type="number" className="farm-input" required value={form.amountTaken} onChange={e=>setForm({...form,amountTaken:e.target.value})} /></div>
+              <button type="submit" className="submit-btn">Log Payment</button>
+            </form>
+          </div>
+          <SectionDivider label="Payment History" />
+          <div className="tbl-wrap">
+            <table className="data-table">
+              <thead><tr><th>Date</th><th>Worker</th><th>Amount</th><th>Del</th></tr></thead>
+              <tbody>{labPayLog.map(lp=>(
+                <tr key={lp.id}><td>{lp.date}</td><td style={{fontWeight:700}}>{lp.workerName}</td>
+                  <td className="green-val">₹{moneyFmt(lp.amountTaken)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))setLabPayLog(prev=>prev.filter(x=>x.id!==lp.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  ACCOUNTS BOOK
+    // ─────────────────────────────────────────────
+    function AccountsBook(p) {
+      const [view, setView] = useState('DASHBOARD');
+      const [medForm, setMedForm] = useState({date:'',item:'',vendor:'',amount:''});
+
+      const bhaisMap={};
+      p.koriLog.forEach(k=>{if(!bhaisMap[k.bhaisWala])bhaisMap[k.bhaisWala]={purchased:0,paid:0};bhaisMap[k.bhaisWala].purchased+=k.amount;});
+      p.bhaisPayLog.forEach(py=>{if(!bhaisMap[py.bhaisWala])bhaisMap[py.bhaisWala]={purchased:0,paid:0};bhaisMap[py.bhaisWala].paid+=py.amount;});
+      const bhaisOutstanding = Object.values(bhaisMap).reduce((s,v)=>s+(v.purchased-v.paid),0);
+
+      const danaMap={};
+      p.purchases.forEach(pu=>{if(!danaMap[pu.broker])danaMap[pu.broker]={purchased:0,paid:0};danaMap[pu.broker].purchased+=pu.totalCost;});
+      p.danaPayLog.forEach(py=>{if(!danaMap[py.broker])danaMap[py.broker]={purchased:0,paid:0};danaMap[py.broker].paid+=py.amount;});
+      const danaOutstanding = Object.values(danaMap).reduce((s,v)=>s+(v.purchased-v.paid),0);
+
+      const milkRevenue = p.supply.reduce((s,x)=>s+x.amount,0);
+      const milkReceived = p.milkPayLog.reduce((s,x)=>s+x.amount,0);
+      const slaRevenue = p.slaughtered.reduce((s,x)=>s+x.amount,0);
+      const feedCost = p.purchases.reduce((s,x)=>s+x.totalCost,0);
+      const medCost = p.medicineLog.reduce((s,x)=>s+x.amount,0);
+      const koriCost = p.koriLog.reduce((s,x)=>s+x.amount,0);
+      const nooraActive = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)&&b.shed==='Noora').length;
+      const tosifActive = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)&&b.shed==='Tosif').length;
+      const nooraBill = nooraActive*p.rates.nooraPerMonth;
+      const tosifBill = tosifActive*p.rates.tosifPerMonth;
+      const irshadBill = p.tajiLog.length*p.rates.irshadPerTaji + p.bakdiLog.length*p.rates.irshadPerBakdi;
+      const labourCost = p.labour.reduce((s,w)=>s+w.pagarPerMonth,0);
+      const totalIncome = milkRevenue + slaRevenue;
+      const totalExpense = feedCost + medCost + koriCost + nooraBill + tosifBill + irshadBill + labourCost;
+
+      const submitMed = e => {
+        e.preventDefault();
+        p.setMedicineLog(prev=>[...prev,{id:'med-'+Date.now(),...medForm,amount:Number(medForm.amount)}]);
+        alert('Medicine entry saved.');
+        setMedForm({date:'',item:'',vendor:'',amount:''});
+      };
+
+      if(view==='BHAIS_LEDGER') return(
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--primary)',fontWeight:800,fontSize:14,textTransform:'uppercase'}}>Bhaiswala Ledger</span>
+            <BackBtn onClick={()=>setView('DASHBOARD')} />
+          </div>
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Name</th><th>Purchased</th><th>Paid</th><th>Balance</th></tr></thead>
+              <tbody>{Object.entries(bhaisMap).map(([n,v])=>(
+                <tr key={n}><td style={{fontWeight:700}}>{n}</td><td>₹{moneyFmt(v.purchased)}</td>
+                  <td className="green-val">₹{moneyFmt(v.paid)}</td>
+                  <td className={v.purchased-v.paid>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(v.purchased-v.paid)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+      if(view==='DANA_LEDGER') return(
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:8}}>
+            <span style={{color:'var(--primary)',fontWeight:800,fontSize:14,textTransform:'uppercase'}}>Dana Wala Ledger</span>
+            <BackBtn onClick={()=>setView('DASHBOARD')} />
+          </div>
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Broker</th><th>Purchased</th><th>Paid</th><th>Balance</th></tr></thead>
+              <tbody>{Object.entries(danaMap).map(([n,v])=>(
+                <tr key={n}><td style={{fontWeight:700}}>{n}</td><td>₹{moneyFmt(v.purchased)}</td>
+                  <td className="green-val">₹{moneyFmt(v.paid)}</td>
+                  <td className={v.purchased-v.paid>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(v.purchased-v.paid)}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+      if(view==='MEDICINE') return(
+        <div className="scroll-page" style={{paddingTop:10}}>
+          <div className="form-panel">
+            <div className="panel-header"><span>Medicine Expenses</span><BackBtn onClick={()=>setView('DASHBOARD')} /></div>
+            <form onSubmit={submitMed}>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Date</label><input type="date" className="farm-input" required value={medForm.date} onChange={e=>setMedForm({...medForm,date:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Medicine / Item</label><input type="text" className="farm-input" required value={medForm.item} onChange={e=>setMedForm({...medForm,item:e.target.value})} /></div>
+              </div>
+              <div className="grid-2">
+                <div className="input-row"><label className="field-lbl">Vendor</label><input type="text" className="farm-input" value={medForm.vendor} onChange={e=>setMedForm({...medForm,vendor:e.target.value})} /></div>
+                <div className="input-row"><label className="field-lbl">Amount (₹)</label><input type="number" className="farm-input" required value={medForm.amount} onChange={e=>setMedForm({...medForm,amount:e.target.value})} /></div>
+              </div>
+              <button type="submit" className="submit-btn">Save Medicine Entry</button>
+            </form>
+          </div>
+          <SectionDivider label="Medicine Log" />
+          <div className="tbl-wrap">
+            <table className="data-table" style={{minWidth:0}}>
+              <thead><tr><th>Date</th><th>Item</th><th>Vendor</th><th>Amount</th><th>Del</th></tr></thead>
+              <tbody>{p.medicineLog.map(m=>(
+                <tr key={m.id}><td>{m.date}</td><td style={{fontWeight:700}}>{m.item}</td><td>{m.vendor}</td>
+                  <td className="red-val">₹{moneyFmt(m.amount)}</td>
+                  <td><DelBtn onClick={()=>{if(window.confirm('Delete?'))p.setMedicineLog(prev=>prev.filter(x=>x.id!==m.id))}} /></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </div>
+      );
+
+      return (
+        <div>
+          <PageHeader title="Accounts" sub="Financial Overview" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+            <SectionDivider label="Accounts Dashboard" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Bhaiswala Outstanding',val:'₹'+moneyFmt(bhaisOutstanding),color:'#EF4444',v:'BHAIS_LEDGER'},
+                {label:'Dana Wala Outstanding',val:'₹'+moneyFmt(danaOutstanding),color:'#F59E0B',v:'DANA_LEDGER'},
+                {label:'Milk Revenue',val:'₹'+moneyFmt(milkRevenue),color:'#10B981',v:'BHAIS_LEDGER'},
+                {label:'Slaughter Revenue',val:'₹'+moneyFmt(slaRevenue),color:'#10B981',v:'BHAIS_LEDGER'},
+                {label:'Total Income',val:'₹'+moneyFmt(totalIncome),color:'#34D399',v:'BHAIS_LEDGER'},
+                {label:'Total Expense',val:'₹'+moneyFmt(totalExpense),color:'#EF4444',v:'BHAIS_LEDGER'},
+              ].map((c,i)=>(
+                <div key={i} className="d-card" style={{borderLeft:`4px solid ${c.color}`}} onClick={()=>setView(c.v)}>
+                  <div className="d-card-left"><div className="d-label">{c.label}</div>
+                    <div className="d-val-sm" style={{color:c.color}}>{c.val}</div>
+                  </div><span style={{fontSize:12,color:'var(--text-muted)'}}>➔</span>
+                </div>
+              ))}
+            </div>
+            <SectionDivider label="Expense Breakdown" />
+            <div className="form-panel">
+              {[
+                ['Kori (Buffalo Purchase)','₹'+moneyFmt(koriCost),'red-val'],
+                ['Feed (Dana Wala)','₹'+moneyFmt(feedCost),'red-val'],
+                ['Medicine','₹'+moneyFmt(medCost),'red-val'],
+                ['Noora Bill ('+nooraActive+' Hd)','₹'+moneyFmt(nooraBill),'amber-val'],
+                ['Tosif Bill ('+tosifActive+' Hd)','₹'+moneyFmt(tosifBill),'amber-val'],
+                ['Irshad Freight','₹'+moneyFmt(irshadBill),'amber-val'],
+                ['Labour Pagar','₹'+moneyFmt(labourCost),'red-val'],
+              ].map(([k,v,cls],i)=>(
+                <div key={i} className="report-row"><span className="report-key">{k}</span><span className={`report-val ${cls}`}>{v}</span></div>
+              ))}
+            </div>
+            <SectionDivider label="Quick Links" />
+            <div className="dash-grid-2">
+              {[
+                {label:'Bhaiswala Ledger',icon:'🐃',v:'BHAIS_LEDGER',color:'#F59E0B'},
+                {label:'Dana Wala Ledger',icon:'🌾',v:'DANA_LEDGER',color:'#A855F7'},
+                {label:'Medicine Log',icon:'💊',v:'MEDICINE',color:'#EF4444'},
+              ].map(btn=>(
+                <div key={btn.v} className="action-card" style={{background:`linear-gradient(135deg,${btn.color}22,${btn.color}44)`,border:`1px solid ${btn.color}55`}} onClick={()=>setView(btn.v)}>
+                  <div className="ac-label">Accounts</div><div className="ac-title">{btn.icon} {btn.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─────────────────────────────────────────────
+    //  REPORTS BOOK
+    // ─────────────────────────────────────────────
+    function ReportsBook(p) {
+      const [period, setPeriod] = useState('monthly');
+      const [month, setMonth] = useState('2026-06');
+      const [custFilter, setCustFilter] = useState('');
+
+      const milkRevenue = p.supply.reduce((s,x)=>s+x.amount,0);
+      const milkReceived = p.milkPayLog.reduce((s,x)=>s+x.amount,0);
+      const slaRevenue = p.slaughtered.reduce((s,x)=>s+x.amount,0);
+      const feedCost = p.purchases.reduce((s,x)=>s+x.totalCost,0);
+      const medCost = p.medicineLog.reduce((s,x)=>s+x.amount,0);
+      const koriCost = p.koriLog.reduce((s,x)=>s+x.amount,0);
+      const labourCost = p.labour.reduce((s,w)=>s+w.pagarPerMonth,0);
+      const nooraActive = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)&&b.shed==='Noora').length;
+      const tosifActive = p.buffalo.filter(b=>!b.outgoingDate&&!['Dead','Slaughtered'].includes(b.status)&&b.shed==='Tosif').length;
+      const palakCost = nooraActive*p.rates.nooraPerMonth + tosifActive*p.rates.tosifPerMonth;
+      const irshadCost = p.tajiLog.length*p.rates.irshadPerTaji + p.bakdiLog.length*p.rates.irshadPerBakdi;
+
+      const customers = [...new Set(p.supply.map(s=>s.customer))];
+      const getCustomerReport = cust => {
+        const bills = p.supply.filter(s=>s.customer===cust);
+        const pays = p.milkPayLog.filter(m=>m.customer===cust);
+        const totalBill = bills.reduce((t,b)=>t+b.amount,0);
+        const totalPaid = pays.reduce((t,py)=>t+py.amount,0);
+        return {totalBill, totalPaid, outstanding:totalBill-totalPaid, entries:bills.length};
+      };
+
+      return (
+        <div>
+          <PageHeader title="Reports" sub="Analytics & Summary" onTheme={()=>p.setIsDark(!p.isDark)} isDark={p.isDark} />
+          <div className="scroll-page" style={{paddingTop:10}}>
+
+            <SectionDivider label="Overall Farm P&L Summary" />
+            <div className="form-panel">
+              {[
+                ['Milk Revenue',milkRevenue,'green-val'],['Milk Received',milkReceived,'green-val'],
+                ['Slaughter Revenue',slaRevenue,'green-val'],['Total Income',milkRevenue+slaRevenue,'green-val'],
+                ['Feed Cost',feedCost,'red-val'],['Medicine Cost',medCost,'red-val'],
+                ['Kori Purchase',koriCost,'red-val'],['Labour Pagar',labourCost,'red-val'],
+                ['Palak Charges',palakCost,'amber-val'],['Irshad Freight',irshadCost,'amber-val'],
+                ['Total Expense',feedCost+medCost+koriCost+labourCost+palakCost+irshadCost,'red-val'],
+                ['NET P&L',milkRevenue+slaRevenue-(feedCost+medCost+koriCost+labourCost+palakCost+irshadCost),'green-val']
+              ].map(([k,v,cls],i)=>(
+                <div key={i} className="report-row" style={i===11?{borderTop:'2px solid var(--primary)',fontWeight:800}:{}}><span className="report-key">{k}</span><span className={`report-val ${cls}`}>₹{moneyFmt(v)}</span></div>
+              ))}
+            </div>
+
+            <SectionDivider label="Customer-wise Milk Report" />
+            <div className="input-row" style={{padding:'0 0 10px 0'}}>
+              <label className="field-lbl">Filter by Customer</label>
+              <select className="farm-select" value={custFilter} onChange={e=>setCustFilter(e.target.value)}>
+                <option value="">-- All Customers --</option>
+                {customers.map(c=><option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="tbl-wrap">
+              <table className="data-table" style={{minWidth:0}}>
+                <thead><tr><th>Customer</th><th>Total Bill</th><th>Paid</th><th>Outstanding</th></tr></thead>
+                <tbody>{(custFilter?[custFilter]:customers).map(c=>{const r=getCustomerReport(c);return(
+                  <tr key={c}><td style={{fontWeight:700}}>{c}</td><td>₹{moneyFmt(r.totalBill)}</td>
+                    <td className="green-val">₹{moneyFmt(r.totalPaid)}</td>
+                    <td className={r.outstanding>0?'red-val':'green-val'} style={{fontWeight:800}}>₹{moneyFmt(r.outstanding)}</td>
+                  </tr>
+                );})}</tbody>
+              </table>
+            </div>
+
+            <SectionDivider label="Palak & Irshad Bill Summary" />
+            <div className="form-panel">
+              {[
+                ['Noora ('+nooraActive+' Hd × ₹'+p.rates.nooraPerMonth+')',nooraActive*p.rates.nooraPerMonth],
+                ['Tosif ('+tosifActive+' Hd × ₹'+p.rates.tosifPerMonth+')',tosifActive*p.rates.tosifPerMonth],
+                ['Irshad — Taji ('+p.tajiLog.length+' × ₹'+p.rates.irshadPerTaji+')',p.tajiLog.length*p.rates.irshadPerTaji],
+                ['Irshad — Bakdi ('+p.bakdiLog.length+' × ₹'+p.rates.irshadPerBakdi+')',p.bakdiLog.length*p.rates.irshadPerBakdi],
+              ].map(([k,v],i)=>(
+                <div key={i} className="report-row"><span className="report-key">{k}</span><span className="report-val amber-val">₹{moneyFmt(v)}</span></div>
+              ))}
+            </div>
+
+            <SectionDivider label="Slaughtered Animals Summary" />
+            <div className="tbl-wrap">
+              <table className="data-table" style={{minWidth:0}}>
+                <thead><tr><th>Tag</th><th>Date</th><th>Amount</th><th>Kasai</th></tr></thead>
+                <tbody>{p.slaughtered.map(s=>(
+                  <tr key={s.id}><td style={{fontWeight:700}}>{s.tagId}</td><td>{s.outgoingDate}</td>
+                    <td className="green-val">₹{moneyFmt(s.amount)}</td><td>{s.kasaiName}</td></tr>
+                ))}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── RENDER ──
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
